@@ -1,10 +1,9 @@
 #include <iostream>
 
 #include "lexer.hpp"
+#include "parser.hpp"
 
 int main(){
     Lexer lexer;
-    while(auto token = lexer.next()){
-        token->print();
-    }
+    parse_expression(lexer)->print();
 }

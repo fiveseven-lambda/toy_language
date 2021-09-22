@@ -17,6 +17,8 @@ public:
     // 次のトークンを返す．
     // EOF なら nullptr
     std::unique_ptr<token::Token> &peek(), next();
+    // peek されているトークンを捨てる．
+    void consume();
 };
 
 #endif
