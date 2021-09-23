@@ -20,7 +20,7 @@ static std::unique_ptr<syntax::Expression> parse_factor(Lexer &lexer){
         ){
             factor = std::make_unique<syntax::Integer>(value.value());
         }else{
-            factor = std::make_unique<syntax::Unary>(parse_factor(lexer), prefix.value());
+            factor = std::make_unique<syntax::Unary>(prefix.value(), parse_factor(lexer));
         }
     }else if(token->is_opening_parenthesis()){
         lexer.consume();
@@ -34,6 +34,24 @@ static std::unique_ptr<syntax::Expression> parse_factor(Lexer &lexer){
     return factor;
 }
 
+static std::unique_ptr<syntax::Expression> parse_binary_operator(Lexer &lexer, int precedence){
+    if(precedence == syntax::MaxPrecedence) return parse_factor(lexer);
+    auto left = parse_binary_operator(lexer, precedence + 1);
+    for(;;){
+        if(auto &token = lexer.peek()){
+            if(auto binary_operator = token->binary_operator()){
+                if(syntax::precedence(binary_operator.value()) == precedence){
+                    lexer.consume();
+                    auto right = parse_binary_operator(lexer, precedence + 1);
+                    left = std::make_unique<syntax::Binary>(binary_operator.value(), std::move(left), std::move(right));
+                    continue;
+                }
+            }
+        }
+        return left;
+    }
+}
+
 std::unique_ptr<syntax::Expression> parse_expression(Lexer &lexer){
-    return parse_factor(lexer);
+    return parse_binary_operator(lexer, 0);
 }

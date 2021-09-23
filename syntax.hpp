@@ -27,20 +27,26 @@ namespace syntax {
         Plus, Minus
     };
     class Unary : public Expression {
-        std::unique_ptr<Expression> operand;
         UnaryOperator unary_operator;
+        std::unique_ptr<Expression> operand;
     public:
-        Unary(std::unique_ptr<Expression>, UnaryOperator);
+        Unary(UnaryOperator, std::unique_ptr<Expression>);
         void print(int) override;
     };
     enum class BinaryOperator {
         Add, Sub, Mul, Div
     };
+    enum Precedence {
+        AddSubPrecedence,
+        MulDivPrecedence,
+        MaxPrecedence
+    };
+    Precedence precedence(BinaryOperator);
     class Binary : public Expression {
-        std::unique_ptr<Expression> left, right;
         BinaryOperator binary_operator;
+        std::unique_ptr<Expression> left, right;
     public:
-        Binary(std::unique_ptr<Expression>, std::unique_ptr<Expression>, BinaryOperator);
+        Binary(BinaryOperator, std::unique_ptr<Expression>, std::unique_ptr<Expression>);
         void print(int) override;
     };
 }

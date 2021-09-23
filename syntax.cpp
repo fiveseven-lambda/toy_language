@@ -6,13 +6,24 @@ namespace syntax {
         name(std::move(name)) {}
     Integer::Integer(std::int32_t value):
         value(value) {}
-    Unary::Unary(std::unique_ptr<Expression> operand, UnaryOperator unary_operator):
-        operand(std::move(operand)),
-        unary_operator(unary_operator) {}
-    Binary::Binary(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, BinaryOperator binary_operator):
+    Unary::Unary(UnaryOperator unary_operator, std::unique_ptr<Expression> operand):
+        unary_operator(unary_operator),
+        operand(std::move(operand)) {}
+    Binary::Binary(BinaryOperator binary_operator, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right):
+        binary_operator(binary_operator),
         left(std::move(left)),
-        right(std::move(right)),
-        binary_operator(binary_operator) {}
+        right(std::move(right)) {}
+
+    Precedence precedence(BinaryOperator binary_operator){
+        switch(binary_operator){
+            case BinaryOperator::Add:
+            case BinaryOperator::Sub:
+                return AddSubPrecedence;
+            case BinaryOperator::Mul:
+            case BinaryOperator::Div:
+                return MulDivPrecedence;
+        }
+    }
 }
 
 #include <iostream>
