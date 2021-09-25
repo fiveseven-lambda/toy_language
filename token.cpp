@@ -59,4 +59,8 @@ namespace token {
     bool OpeningParenthesis::is_opening_parenthesis(){ return true; }
     bool Token::is_closing_parenthesis(){ return false; }
     bool ClosingParenthesis::is_closing_parenthesis(){ return true; }
+    bool Token::is_comma(){ return false; }
+    bool Comma::is_comma(){ return true; }
+    bool Token::is_semicolon(){ return false; }
+    bool Semicolon::is_semicolon(){ return true; }
 }

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace syntax {
     class Expression {
@@ -47,6 +48,13 @@ namespace syntax {
         std::unique_ptr<Expression> left, right;
     public:
         Binary(BinaryOperator, std::unique_ptr<Expression>, std::unique_ptr<Expression>);
+        void print(int) override;
+    };
+    class Invocation : public Expression {
+        std::unique_ptr<Expression> function;
+        std::vector<std::unique_ptr<Expression>> arguments;
+    public:
+        Invocation(std::unique_ptr<Expression>, std::vector<std::unique_ptr<Expression>>);
         void print(int) override;
     };
 }

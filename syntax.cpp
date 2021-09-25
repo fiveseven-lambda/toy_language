@@ -13,6 +13,9 @@ namespace syntax {
         binary_operator(binary_operator),
         left(std::move(left)),
         right(std::move(right)) {}
+    Invocation::Invocation(std::unique_ptr<Expression> function, std::vector<std::unique_ptr<Expression>> arguments):
+        function(std::move(function)),
+        arguments(std::move(arguments)) {}
 
     Precedence precedence(BinaryOperator binary_operator){
         switch(binary_operator){
@@ -59,5 +62,15 @@ namespace syntax {
         for(int i = 0; i < indent; ++i) std::cout << TAB;
         std::cout << "Binary(" << name << ")" << std::endl;
         right->print(indent + 1);
+    }
+    void Invocation::print(int indent){
+        for(int i = 0; i < indent; ++i) std::cout << TAB;
+        std::cout << "Invocation" << std::endl;
+        function->print(indent + 1);
+        for(int i = 0; i < indent; ++i) std::cout << TAB;
+        std::cout << "arguments: " << std::endl;
+        for(auto &argument: arguments){
+            argument->print(indent + 1);
+        }
     }
 }

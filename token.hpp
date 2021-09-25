@@ -18,7 +18,7 @@ namespace token {
 		virtual std::optional<std::int32_t> positive_integer(), negative_integer();
 		virtual std::optional<syntax::UnaryOperator> prefix();
 		virtual std::optional<syntax::BinaryOperator> binary_operator();
-		virtual bool is_opening_parenthesis(), is_closing_parenthesis();
+		virtual bool is_opening_parenthesis(), is_closing_parenthesis(), is_comma(), is_semicolon();
 	};
 	class Identifier : public Token {
 		std::string name;
@@ -51,6 +51,12 @@ namespace token {
 	};
 	class ClosingParenthesis : public Token {
 		bool is_closing_parenthesis() override;
+	};
+	class Comma : public Token {
+		bool is_comma() override;
+	};
+	class Semicolon : public Token {
+		bool is_semicolon() override;	
 	};
 }
 

@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "error.hpp"
 
 #include <iostream>
 
@@ -23,6 +24,10 @@ std::unique_ptr<token::Token> &Lexer::peek(){
             peeked = std::make_unique<token::Hyphen>();
         }else if(first == '*'){
             peeked = std::make_unique<token::Asterisk>();
+        }else if(first == ','){
+            peeked = std::make_unique<token::Comma>();
+        }else if(first == ';'){
+            peeked = std::make_unique<token::Semicolon>();
         }else if(first == '('){
             peeked = std::make_unique<token::OpeningParenthesis>();
         }else if(first == ')'){
@@ -53,6 +58,8 @@ std::unique_ptr<token::Token> &Lexer::peek(){
             std::string ret(1, std::string::traits_type::to_char_type(first));
             while(std::isdigit(input.peek())) ret.push_back(std::string::traits_type::to_char_type(input.get()));
             peeked = std::make_unique<token::Integer>(std::move(ret));
+        }else{
+            throw error::make<error::UnexpectedCharacter>(first);
         }
     }
     return peeked.value();
