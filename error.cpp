@@ -9,4 +9,7 @@ namespace error {
     void UnexpectedCharacter::print(){
         std::cerr << "unexpected character: " << c << std::endl;
     }
+    void NoClosingParenthesis::print(){
+        std::cerr << "no closing parenthesis" << std::endl;
+    }
 }

@@ -1,8 +1,9 @@
 #include "parser.hpp"
+#include "error.hpp"
 
 #include <iostream>
 
-static std::unique_ptr<syntax::Expression> parse_factor(Lexer &), parse_binary_operator(Lexer &, int);
+static std::unique_ptr<syntax::Expression> parse_factor(Lexer &), parse_binary_operator(Lexer &, int), parse_expression(Lexer &);
 static std::vector<std::unique_ptr<syntax::Expression>> parse_arguments(Lexer &);
 
 std::unique_ptr<syntax::Expression> parse_factor(Lexer &lexer){
@@ -30,7 +31,7 @@ std::unique_ptr<syntax::Expression> parse_factor(Lexer &lexer){
             lexer.consume();
             factor = parse_expression(lexer);
             if(auto close = lexer.next(); !(close && close->is_closing_parenthesis())){
-                std::cerr << "syntax error" << std::endl;
+                throw error::make<error::NoClosingParenthesis>();
             }
         }else{
             return nullptr;
@@ -43,7 +44,7 @@ std::unique_ptr<syntax::Expression> parse_factor(Lexer &lexer){
             lexer.consume();
             auto arguments = parse_arguments(lexer);
             if(auto close = lexer.next(); !(close && close->is_closing_parenthesis())){
-                std::cerr << "syntax error" << std::endl;
+                throw error::make<error::NoClosingParenthesis>();
             }
             factor = std::make_unique<syntax::Invocation>(std::move(factor), std::move(arguments));
         }else{
@@ -88,5 +89,16 @@ std::vector<std::unique_ptr<syntax::Expression>> parse_arguments(Lexer &lexer){
             }
             return ret;
         }
+    }
+}
+
+std::unique_ptr<syntax::Sentence> parse_sentence(Lexer &lexer){
+    auto expression = parse_expression(lexer);
+    auto &token = lexer.peek();
+    if(!token){
+        return nullptr;
+    }else if(token->is_semicolon()){
+        lexer.consume();
+        return std::make_unique<syntax::ExpressionSentence>(std::move(expression));
     }
 }

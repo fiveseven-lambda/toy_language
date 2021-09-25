@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include "token.hpp"
 
 namespace error {
     class Error {
@@ -20,6 +21,11 @@ namespace error {
         char c;
     public:
         UnexpectedCharacter(char);
+        void print() override;
+    };
+
+    class NoClosingParenthesis : public Error {
+    public:
         void print() override;
     };
 }

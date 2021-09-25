@@ -7,7 +7,13 @@
 int main(){
     Lexer lexer;
     try{
-        parse_expression(lexer)->print();
+        for(;;){
+            auto sentence = parse_sentence(lexer);
+            if(!sentence){
+                break;
+            }
+            sentence->print();
+        }
     }catch(std::unique_ptr<error::Error> &e){
         e->print();
     }

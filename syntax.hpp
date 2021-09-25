@@ -57,6 +57,18 @@ namespace syntax {
         Invocation(std::unique_ptr<Expression>, std::vector<std::unique_ptr<Expression>>);
         void print(int) override;
     };
+
+    class Sentence {
+    public:
+        virtual ~Sentence();
+        virtual void print(int = 0) = 0;
+    };
+    class ExpressionSentence : public Sentence {
+        std::unique_ptr<Expression> expression;
+    public:
+        ExpressionSentence(std::unique_ptr<Expression>);
+        void print(int) override;
+    };
 }
 
 #endif

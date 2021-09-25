@@ -27,6 +27,10 @@ namespace syntax {
                 return MulDivPrecedence;
         }
     }
+
+    Sentence::~Sentence() = default;
+    ExpressionSentence::ExpressionSentence(std::unique_ptr<Expression> expression):
+        expression(std::move(expression)) {}
 }
 
 #include <iostream>
@@ -72,5 +76,10 @@ namespace syntax {
         for(auto &argument: arguments){
             argument->print(indent + 1);
         }
+    }
+    void ExpressionSentence::print(int indent){
+        for(int i = 0; i < indent; ++i) std::cout << TAB;
+        std::cout << "Expression" << std::endl;
+        if(expression) expression->print(indent + 1);
     }
 }

@@ -5,6 +5,6 @@
 #include "lexer.hpp"
 #include "syntax.hpp"
 
-std::unique_ptr<syntax::Expression> parse_expression(Lexer &);
+std::unique_ptr<syntax::Sentence> parse_sentence(Lexer &);
 
 #endif
