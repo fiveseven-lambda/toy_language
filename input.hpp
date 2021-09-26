@@ -8,7 +8,7 @@ class Input {
     bool prompt;
 public:
     Input(std::istream &, bool);
-    int peek(), get();
+    int peek(), get(), get_if(char);
 };
 
 #endif

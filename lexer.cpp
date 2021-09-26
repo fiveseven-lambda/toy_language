@@ -28,6 +28,20 @@ std::unique_ptr<token::Token> &Lexer::peek(){
             peeked = std::make_unique<token::Comma>();
         }else if(first == ';'){
             peeked = std::make_unique<token::Semicolon>();
+        }else if(first == ':'){
+            peeked = std::make_unique<token::Colon>();
+        }else if(first == '='){
+            if(input.get_if('=')){
+                peeked = std::make_unique<token::DoubleEqual>();
+            }else{
+                peeked = std::make_unique<token::Equal>();
+            }
+        }else if(first == '!'){
+            if(input.get_if('=')){
+                peeked = std::make_unique<token::ExclamationEqual>();
+            }else{
+                peeked = std::make_unique<token::Exclamation>();
+            }
         }else if(first == '('){
             peeked = std::make_unique<token::OpeningParenthesis>();
         }else if(first == ')'){

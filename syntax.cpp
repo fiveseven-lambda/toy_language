@@ -25,6 +25,9 @@ namespace syntax {
             case BinaryOperator::Mul:
             case BinaryOperator::Div:
                 return MulDivPrecedence;
+            case BinaryOperator::Equal:
+            case BinaryOperator::NotEqual:
+                return EqualPrecedence;
         }
     }
 
@@ -48,7 +51,8 @@ namespace syntax {
         std::string name;
         switch(unary_operator){
             case UnaryOperator::Plus: name = "plus"; break;
-            case UnaryOperator::Minus: name = "minus";
+            case UnaryOperator::Minus: name = "minus"; break;
+            case UnaryOperator::Not: name = "not";
         }
         for(int i = 0; i < indent; ++i) std::cout << TAB;
         std::cout << "Unary(" << name << ")" << std::endl;
@@ -61,7 +65,9 @@ namespace syntax {
             case BinaryOperator::Add: name = "add"; break;
             case BinaryOperator::Sub: name = "sub"; break;
             case BinaryOperator::Mul: name = "mul"; break;
-            case BinaryOperator::Div: name = "div";
+            case BinaryOperator::Div: name = "div"; break;
+            case BinaryOperator::Equal: name = "equal"; break;
+            case BinaryOperator::NotEqual: name = "not equal";
         }
         for(int i = 0; i < indent; ++i) std::cout << TAB;
         std::cout << "Binary(" << name << ")" << std::endl;

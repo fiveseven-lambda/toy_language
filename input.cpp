@@ -21,3 +21,8 @@ int Input::get() {
     }
     return ret;
 }
+int Input::get_if(char c){
+    bool ret = source.peek() == c;
+    if(ret) get();
+    return ret;
+}

@@ -25,7 +25,8 @@ namespace syntax {
         void print(int) override;
     };
     enum class UnaryOperator {
-        Plus, Minus
+        Plus, Minus,
+        Not
     };
     class Unary : public Expression {
         UnaryOperator unary_operator;
@@ -35,11 +36,14 @@ namespace syntax {
         void print(int) override;
     };
     enum class BinaryOperator {
-        Add, Sub, Mul, Div
+        Add, Sub, Mul, Div,
+        Equal, NotEqual
     };
     enum Precedence {
         AddSubPrecedence,
         MulDivPrecedence,
+        ComparePrecedence,
+        EqualPrecedence,
         MaxPrecedence
     };
     Precedence precedence(BinaryOperator);
