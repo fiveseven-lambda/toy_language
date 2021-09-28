@@ -3,6 +3,7 @@
 
 #include <boost/safe_numerics/safe_integer.hpp>
 #include <iostream>
+#include "error.hpp"
 
 namespace token {
     Token::Token() = default;
@@ -14,6 +15,18 @@ namespace token {
 
     std::optional<std::string> Token::identifier(){ return std::nullopt; }
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
+    std::unique_ptr<syntax::Type> Token::type(){ return nullptr; }
+    std::unique_ptr<syntax::Type> Identifier::type(){
+        if(name == "int"){
+            return std::make_unique<syntax::Int>();
+        }else if(name == "float"){
+            return std::make_unique<syntax::Float>();
+        }else if(name == "bool"){
+            return std::make_unique<syntax::Bool>();
+        }else{
+            throw error::make<error::SyntaxError>();
+        }
+    }
 
     using safe_i32 = boost::safe_numerics::safe<std::int32_t>;
     std::optional<std::int32_t> Token::positive_integer(){ return std::nullopt; }

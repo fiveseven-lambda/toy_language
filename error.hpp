@@ -28,6 +28,11 @@ namespace error {
     public:
         void print() override;
     };
+
+    class SyntaxError : public Error {
+    public:
+        void print() override;
+    };
 }
 
 #endif

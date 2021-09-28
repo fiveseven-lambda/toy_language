@@ -15,6 +15,7 @@ namespace token {
 	public:
 		virtual ~Token();
 		virtual std::optional<std::string> identifier();
+		virtual std::unique_ptr<syntax::Type> type();
 		virtual std::optional<std::int32_t> positive_integer(), negative_integer();
 		virtual std::optional<syntax::UnaryOperator> prefix();
 		virtual std::optional<syntax::BinaryOperator> binary_operator();
@@ -25,6 +26,7 @@ namespace token {
 	public:
 		Identifier(std::string);
 		std::optional<std::string> identifier() override;
+		std::unique_ptr<syntax::Type> type() override;
 	};
 	class Integer : public Token {
 		std::string value;

@@ -12,4 +12,7 @@ namespace error {
     void NoClosingParenthesis::print(){
         std::cerr << "no closing parenthesis" << std::endl;
     }
+    void SyntaxError::print(){
+        std::cerr << "syntax error" << std::endl;
+    }
 }

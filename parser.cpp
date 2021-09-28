@@ -4,6 +4,7 @@
 #include <iostream>
 
 static std::unique_ptr<syntax::Expression> parse_factor(Lexer &), parse_binary_operator(Lexer &, int), parse_expression(Lexer &);
+static std::unique_ptr<syntax::Type> parse_type(Lexer &);
 static std::vector<std::unique_ptr<syntax::Expression>> parse_arguments(Lexer &);
 
 std::unique_ptr<syntax::Expression> parse_factor(Lexer &lexer){
@@ -100,5 +101,41 @@ std::unique_ptr<syntax::Sentence> parse_sentence(Lexer &lexer){
     }else if(token->is_semicolon()){
         lexer.consume();
         return std::make_unique<syntax::ExpressionSentence>(std::move(expression));
+    }else if(token->is_equal()){
+        lexer.consume();
+        auto right = parse_expression(lexer);
+        if(auto semicolon = lexer.next(); !(semicolon && semicolon->is_semicolon())){
+            throw error::make<error::SyntaxError>();
+        }
+        return std::make_unique<syntax::Substitution>(std::move(expression), std::move(right));
+    }else if(token->is_colon()){
+        auto name = expression->into_identifier();
+        if(!name){
+            throw error::make<error::SyntaxError>();
+        }
+        lexer.consume();
+        auto type = parse_type(lexer);
+        if(auto equal = lexer.next(); !(equal && equal->is_equal())){
+            throw error::make<error::SyntaxError>();
+        }
+        auto right = parse_expression(lexer);
+        if(auto semicolon = lexer.next(); !(semicolon && semicolon->is_semicolon())){
+            throw error::make<error::SyntaxError>();
+        }
+        return std::make_unique<syntax::Declaration>(std::move(name.value()), std::move(type), std::move(right));
+    }else{
+        throw error::make<error::SyntaxError>();
+    }
+}
+
+std::unique_ptr<syntax::Type> parse_type(Lexer &lexer){
+    auto &token = lexer.peek();
+    if(!token){
+        return nullptr;
+    }else if(auto type = token->type()){
+        lexer.consume();
+        return type;
+    }else{
+        return nullptr;
     }
 }
