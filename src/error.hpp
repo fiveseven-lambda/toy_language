@@ -25,6 +25,13 @@ namespace error {
         UnexpectedCharacter(pos::Pos &&);
         void eprint(const std::vector<std::string> &) const override;
     };
+
+    class UnterminatedComment : public Error {
+        std::vector<pos::Pos> poss;
+    public:
+        UnterminatedComment(std::vector<pos::Pos> &&);
+        void eprint(const std::vector<std::string> &) const override;
+    };
 }
 
 #endif

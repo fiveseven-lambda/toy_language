@@ -7,13 +7,16 @@
 #include <string>
 #include <queue>
 #include <memory>
+#include <vector>
 
 #include "token.hpp"
 
 namespace lexer {
     class Inner {
+        std::vector<pos::Pos> comment;
     public:
         void run(std::size_t, const std::string &, std::queue<token::TokenWithPos> &);
+        void deal_with_eof();
     };
 
     class Lexer {

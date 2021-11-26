@@ -6,8 +6,6 @@
 #include "token.hpp"
 #include "lexer.hpp"
 
-using namespace std::literals::string_literals;
-
 int main() {
     lexer::Lexer lexer;
     try {

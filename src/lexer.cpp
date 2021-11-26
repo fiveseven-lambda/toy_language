@@ -24,6 +24,7 @@ namespace lexer {
                 std::getline(source, log.back());
                 inner.run(line_num, log.back(), tokens);
             }else{
+                inner.deal_with_eof();
                 tokens.emplace();
             }
         }
@@ -45,7 +46,17 @@ namespace lexer {
         while(true){
             while(true){
                 if(cursor == str.size()) return;
-                if(!std::isspace(str[cursor])) break;
+                if(!comment.empty()){
+                    if(cursor < str.size() - 1){
+                        if(str[cursor] == '*' && str[cursor + 1] == '/'){
+                            comment.pop_back();
+                            cursor += 2;
+                            continue;
+                        }else if(str[cursor] == '/' && str[cursor + 1] == '*'){
+                            comment.emplace_back(line_num, cursor);
+                        }
+                    }
+                }else if(!std::isspace(str[cursor])) break;
                 ++cursor;
             }
             std::size_t start = cursor;
@@ -66,8 +77,16 @@ namespace lexer {
                 if(advance_if('=')) token = std::make_unique<token::AsteriskEqual>();
                 else token = std::make_unique<token::Asterisk>();
             }else if(advance_if('/')){
-                if(advance_if('=')) token = std::make_unique<token::SlashEqual>();
-                else token = std::make_unique<token::Slash>();
+                if(advance_if('=')){
+                    token = std::make_unique<token::SlashEqual>();
+                }else if(str[cursor] == '/'){
+                    return;
+                }else if(advance_if('*')){
+                    comment.emplace_back(line_num, start);
+                    continue;
+                }else{
+                    token = std::make_unique<token::Slash>();
+                }
             }else if(advance_if('%')){
                 if(advance_if('=')) token = std::make_unique<token::PercentEqual>();
                 else token = std::make_unique<token::Percent>();
@@ -126,6 +145,11 @@ namespace lexer {
                 throw error::make<error::UnexpectedCharacter>(pos::Pos(line_num, cursor));
             }
             queue.emplace(pos::Range(line_num, start, cursor), std::move(token));
+        }
+    }
+    void Inner::deal_with_eof(){
+        if(!comment.empty()){
+            throw error::make<error::UnterminatedComment>(std::move(comment));
         }
     }
 }
