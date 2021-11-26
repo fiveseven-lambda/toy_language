@@ -1,14 +1,14 @@
 CXX = clang++
-CXXFLAGS = -std=c++20 -Weverything -Wno-c++98-compat -Wno-shadow-field-in-constructor \
+CXXFLAGS = -std=c++20 -Weverything -Wno-c++98-compat -Wno-shadow-field-in-constructor -Wno-padded \
 	-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
 LDFLAGS = -lLLVM-13
 SRC = $(wildcard src/*.cpp)
 OBJ = $(SRC:src/%.cpp=obj/%.o)
-OUT = bin/interpreter
+TARGET = target/interpreter
 
-$(OUT): $(OBJ)
-	if [ ! -d bin ]; then mkdir bin; fi
-	$(CXX) $(LDFLAGS) -o $(OUT) $(OBJ)
+$(TARGET): $(OBJ)
+	if [ ! -d target ]; then mkdir target; fi
+	$(CXX) $(LDFLAGS) -o $(TARGET) $(OBJ)
 
 obj/%.o: src/%.cpp
 	if [ ! -d obj ]; then mkdir obj; fi
@@ -16,4 +16,4 @@ obj/%.o: src/%.cpp
 
 clean:
 	if [ -d obj ]; then rm -r obj; fi
-	if [ -d bin ]; then rm -r bin; fi
+	if [ -d target ]; then rm -r target; fi

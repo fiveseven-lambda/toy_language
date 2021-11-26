@@ -3,13 +3,20 @@
 
 #include "pos.hpp"
 #include "error.hpp"
+#include "token.hpp"
+#include "lexer.hpp"
 
 using namespace std::literals::string_literals;
 
 int main() {
-    std::vector<std::string> log;
-    log.push_back("abcde"s);
-    log.push_back("ABCDE"s);
-    log.push_back("12345"s);
-    pos::Range(pos::Pos(0, 2), pos::Pos(2, 4)).eprint(log);
+    lexer::Lexer lexer;
+    try {
+        for(;;){
+            auto [pos, token] = lexer.next();
+            if(!token) break;
+            token->debug_print();
+        }
+    }catch(std::unique_ptr<error::Error> &err){
+        err->eprint(lexer.get_log());
+    }
 }
