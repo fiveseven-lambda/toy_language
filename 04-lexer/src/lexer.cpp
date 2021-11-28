@@ -1,21 +1,15 @@
-#include <cctype>
-
 #include "lexer.hpp"
 #include "error.hpp"
 
 namespace lexer {
-    Lexer::Lexer():
-        source(std::cin),
-        prompt(true) {}
-    Lexer::Lexer(std::ifstream &source):
-        source(source),
-        prompt(false) {}
+    Lexer::Lexer(): source(std::cin), prompt(true) {}
+    Lexer::Lexer(std::ifstream &source): source(source), prompt(false) {}
 
     const std::vector<std::string> &Lexer::get_log() const {
         return log;
     }
 
-    std::unique_ptr<token::Token> &Lexer::peek() {
+    std::unique_ptr<token::Token> &Lexer::peek(){
         while(tokens.empty()){
             if(source){
                 auto line_num = log.size();
@@ -30,7 +24,7 @@ namespace lexer {
         }
         return tokens.front();
     }
-    std::unique_ptr<token::Token> Lexer::next() {
+    std::unique_ptr<token::Token> Lexer::next(){
         auto ret = std::move(peek());
         tokens.pop();
         return ret;
@@ -148,8 +142,10 @@ namespace lexer {
             }
             token->pos = pos::Range(line_num, start, cursor);
             queue.push(std::move(token));
+
         }
     }
+
     void Inner::deal_with_eof(){
         if(!comment.empty()){
             throw error::make<error::UnterminatedComment>(std::move(comment));

@@ -3,11 +3,11 @@
 namespace pos {
     Pos::Pos() = default;
     Pos::Pos(std::size_t line, std::size_t byte): line(line), byte(byte) {}
-
     Range::Range() = default;
     Range::Range(std::size_t line, std::size_t start, std::size_t end):
         start(line, start),
         end(line, end) {}
+
 
     std::pair<std::size_t, std::size_t> Pos::into_inner() const {
         return {line, byte};
@@ -17,8 +17,11 @@ namespace pos {
         return os << pos.line + 1 << ":" << pos.byte + 1;
     }
     std::ostream &operator<<(std::ostream &os, const Range &range){
+        auto [sline, sbyte] = range.start.into_inner();
         auto [eline, ebyte] = range.end.into_inner();
-        return os << range.start << "-" << eline + 1 << ":" << ebyte;
+        return os
+            << sline + 1 << ":" << sbyte + 1
+            << "-" << eline + 1 << ":" << ebyte;
     }
 
     void Pos::eprint(const std::vector<std::string> &log) const {

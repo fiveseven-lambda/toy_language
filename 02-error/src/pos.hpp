@@ -3,9 +3,9 @@
 
 #include <cstddef>
 #include <iostream>
+#include <utility>
 #include <vector>
 #include <string>
-#include <utility>
 
 namespace pos {
     class Pos {

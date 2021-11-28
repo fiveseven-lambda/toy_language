@@ -1,54 +1,24 @@
 #include <iostream>
-#include <boost/safe_numerics/safe_integer.hpp>
 
 #include "token.hpp"
-#include "error.hpp"
 
 namespace token {
     Token::~Token() = default;
     Identifier::Identifier(std::string name): name(std::move(name)) {}
     Integer::Integer(std::string value): value(std::move(value)) {}
+}
 
-    std::optional<std::string> Token::identifier(){ return std::nullopt; }
-    std::optional<std::string> Identifier::identifier(){ return std::move(name); }
-
-    using safe_i32 = boost::safe_numerics::safe<std::int32_t>;
-    std::optional<std::int32_t> Token::positive_integer(){ return std::nullopt; }
-    std::optional<std::int32_t> Integer::positive_integer(){
-        safe_i32 ret(0);
-        constexpr safe_i32 base(10);
-        try{
-            for(char c : value){
-                ret = ret * base + safe_i32(c - '0');
-            }
-        }catch(std::exception &e){
-            throw error::make<error::InvalidIntegerLiteral>(e, pos);
-        }
-        return ret;
-    }
-    std::optional<std::int32_t> Token::negative_integer(){ return std::nullopt; }
-    std::optional<std::int32_t> Integer::negative_integer(){
-        safe_i32 ret(0);
-        constexpr safe_i32 base(10);
-        try{
-            for(char c : value){
-                ret = ret * base - safe_i32(c - '0');
-            }
-        }catch(std::exception &e){
-            throw error::make<error::InvalidIntegerLiteral>(e, pos);
-        }
-        return ret;
+#define define_debug_print(name) \
+    void name::debug_print() const { \
+        std::cout << #name << std::endl; \
     }
 
+namespace token {
     void Identifier::debug_print() const {
         std::cout << "Identifier(" << name << ")" << std::endl;
     }
     void Integer::debug_print() const {
         std::cout << "Integer(" << value << ")" << std::endl;
-    }
-#define define_debug_print(name) \
-    void name::debug_print() const { \
-        std::cout << #name << std::endl; \
     }
     define_debug_print(Plus)
     define_debug_print(PlusEqual)

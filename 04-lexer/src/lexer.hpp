@@ -2,11 +2,10 @@
 #define LEXER_HPP
 
 #include <cstddef>
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <queue>
-#include <memory>
+#include <iostream>
+#include <fstream>
 #include <vector>
 
 #include "token.hpp"

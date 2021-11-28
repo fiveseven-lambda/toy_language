@@ -1,11 +1,9 @@
 #ifndef TOKEN_HPP
 #define TOKEN_HPP
 
-#include <string>
 #include <memory>
 #include <utility>
-#include <optional>
-#include <cstddef>
+#include <string>
 
 #include "pos.hpp"
 
@@ -15,8 +13,6 @@ namespace token {
         pos::Range pos;
         virtual ~Token();
         virtual void debug_print() const = 0;
-        virtual std::optional<std::string> identifier();
-        virtual std::optional<std::int32_t> positive_integer(), negative_integer();
     };
 
     class Identifier : public Token {
@@ -24,15 +20,15 @@ namespace token {
     public:
         Identifier(std::string);
         void debug_print() const override;
-        std::optional<std::string> identifier() override;
     };
+
     class Integer : public Token {
         std::string value;
     public:
         Integer(std::string);
         void debug_print() const override;
-        std::optional<std::int32_t> positive_integer() override, negative_integer() override;
     };
+
     class Plus : public Token {
         void debug_print() const override;
     };
