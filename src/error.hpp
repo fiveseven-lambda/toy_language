@@ -22,14 +22,22 @@ namespace error {
     class UnexpectedCharacter : public Error {
         pos::Pos pos;
     public:
-        UnexpectedCharacter(pos::Pos &&);
+        UnexpectedCharacter(pos::Pos);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    class InvalidIntegerLiteral : public Error {
+        std::exception &error;
+        pos::Range pos;
+    public:
+        InvalidIntegerLiteral(std::exception &, pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
 
     class UnterminatedComment : public Error {
         std::vector<pos::Pos> poss;
     public:
-        UnterminatedComment(std::vector<pos::Pos> &&);
+        UnterminatedComment(std::vector<pos::Pos>);
         void eprint(const std::vector<std::string> &) const override;
     };
 }

@@ -15,7 +15,7 @@ namespace lexer {
         return log;
     }
 
-    token::TokenWithPos &Lexer::peek() {
+    std::unique_ptr<token::Token> &Lexer::peek() {
         while(tokens.empty()){
             if(source){
                 auto line_num = log.size();
@@ -30,13 +30,13 @@ namespace lexer {
         }
         return tokens.front();
     }
-    token::TokenWithPos Lexer::next() {
+    std::unique_ptr<token::Token> Lexer::next() {
         auto ret = std::move(peek());
         tokens.pop();
         return ret;
     }
 
-    void Inner::run(std::size_t line_num, const std::string &str, std::queue<token::TokenWithPos> &queue){
+    void Inner::run(std::size_t line_num, const std::string &str, std::queue<std::unique_ptr<token::Token>> &queue){
         std::size_t cursor = 0;
         auto advance_if = [&](char c){
             bool ret = str[cursor] == c;
@@ -54,6 +54,8 @@ namespace lexer {
                             continue;
                         }else if(str[cursor] == '/' && str[cursor + 1] == '*'){
                             comment.emplace_back(line_num, cursor);
+                            cursor += 2;
+                            continue;
                         }
                     }
                 }else if(!std::isspace(str[cursor])) break;
@@ -144,7 +146,8 @@ namespace lexer {
             }else{
                 throw error::make<error::UnexpectedCharacter>(pos::Pos(line_num, cursor));
             }
-            queue.emplace(pos::Range(line_num, start, cursor), std::move(token));
+            token->pos = pos::Range(line_num, start, cursor);
+            queue.push(std::move(token));
         }
     }
     void Inner::deal_with_eof(){

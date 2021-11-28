@@ -15,7 +15,7 @@ namespace lexer {
     class Inner {
         std::vector<pos::Pos> comment;
     public:
-        void run(std::size_t, const std::string &, std::queue<token::TokenWithPos> &);
+        void run(std::size_t, const std::string &, std::queue<std::unique_ptr<token::Token>> &);
         void deal_with_eof();
     };
 
@@ -24,12 +24,12 @@ namespace lexer {
         bool prompt;
         Inner inner;
         std::vector<std::string> log;
-        std::queue<token::TokenWithPos> tokens;
+        std::queue<std::unique_ptr<token::Token>> tokens;
     public:
         Lexer();
         Lexer(std::ifstream &);
         const std::vector<std::string> &get_log() const;
-        token::TokenWithPos next(), &peek();
+        std::unique_ptr<token::Token> next(), &peek();
     };
 }
 

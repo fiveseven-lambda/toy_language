@@ -1,7 +1,7 @@
 #include "pos.hpp"
 
 namespace pos {
-    Pos::Pos(): line(0), byte(0) {}
+    Pos::Pos() = default;
     Pos::Pos(std::size_t line, std::size_t byte): line(line), byte(byte) {}
 
     Range::Range() = default;
