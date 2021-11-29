@@ -45,6 +45,7 @@ namespace parser {
     }
 
     enum Precedence {
+        AssignPrecedence,
         LogicalOrPrecedence,
         LogicalAndPrecedence,
         ComparisonPrecedence,
@@ -54,7 +55,6 @@ namespace parser {
         ShiftPrecedence,
         AddSubPrecedence,
         MulDivRemPrecedence,
-        AssignPrecedence,
         MaxPrecedence
     };
     static Precedence precedence(syntax::BinaryOperator binary_operator){
