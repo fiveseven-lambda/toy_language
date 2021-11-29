@@ -33,11 +33,9 @@ namespace parser {
                 ret = parse_expression(lexer);
                 if(!ret) throw error::make<error::EmptyParenthesis>(std::move(pos));
                 auto close = lexer.next();
-                if(close && close->is_closing_parenthesis()){
-                    pos += close->pos;
-                }else{
-                    throw error::make<error::NoClosingParenthesis>(std::move(pos));
-                }
+                if(!close) throw error::make<error::NoClosingParenthesis>(std::move(pos));
+                if(!close->is_closing_parenthesis()) throw error::make<error::UnexpectedTokenInParenthesis>(std::move(close->pos), std::move(pos));
+                pos += close->pos;
             }else{
                 return nullptr;
             }
@@ -49,13 +47,11 @@ namespace parser {
                 pos::Range pos = lexer.next()->pos;
                 auto arguments = parse_arguments(lexer);
                 auto close = lexer.next();
-                if(close && close->is_closing_parenthesis()){
-                    ret = std::make_unique<syntax::Invocation>(std::move(ret), std::move(arguments));
-                    pos += close->pos;
-                    ret->pos = pos;
-                }else{
-                    throw error::make<error::NoClosingParenthesis>(std::move(pos));
-                }
+                if(!close) throw error::make<error::NoClosingParenthesis>(std::move(pos));
+                if(!close->is_closing_parenthesis()) throw error::make<error::UnexpectedTokenInParenthesis>(std::move(close->pos), std::move(pos));
+                ret = std::make_unique<syntax::Invocation>(std::move(ret), std::move(arguments));
+                pos += close->pos;
+                ret->pos = pos;
             }else{
                 return ret;
             }
@@ -160,7 +156,7 @@ namespace parser {
         while(true){
             auto argument = parse_expression(lexer);
             auto &token = lexer.peek();
-            if(token->is_comma()){
+            if(token && token->is_comma()){
                 auto pos_comma = lexer.next()->pos;
                 if(!argument) throw error::make<error::EmptyArgument>(std::move(pos_comma));
                 ret.push_back(std::move(argument));

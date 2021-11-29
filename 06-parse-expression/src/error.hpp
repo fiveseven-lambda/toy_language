@@ -55,6 +55,13 @@ namespace error {
         void eprint(const std::vector<std::string> &) const override;
     };
 
+    class UnexpectedTokenInParenthesis : public Error {
+        pos::Range pos, open;
+    public:
+        UnexpectedTokenInParenthesis(pos::Range, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
     class EmptyParenthesis : public Error {
         pos::Range pos;
     public:

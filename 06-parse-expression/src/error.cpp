@@ -7,6 +7,7 @@ namespace error {
     InvalidIntegerLiteral::InvalidIntegerLiteral(std::exception &error, pos::Range pos): error(error), pos(std::move(pos)) {}
     NoExpressionAfterOperator::NoExpressionAfterOperator(pos::Range pos): pos(std::move(pos)) {}
     NoClosingParenthesis::NoClosingParenthesis(pos::Range pos): pos(std::move(pos)) {}
+    UnexpectedTokenInParenthesis::UnexpectedTokenInParenthesis(pos::Range pos, pos::Range open): pos(std::move(pos)), open(std::move(open)) {}
     EmptyParenthesis::EmptyParenthesis(pos::Range pos): pos(std::move(pos)) {}
     EmptyArgument::EmptyArgument(pos::Range pos): pos(std::move(pos)) {}
 
@@ -32,6 +33,12 @@ namespace error {
     void NoClosingParenthesis::eprint(const std::vector<std::string> &log) const {
         std::cerr << "no closing parenthesis (opened at " << pos << ")" << std::endl;
         pos.eprint(log);
+    }
+    void UnexpectedTokenInParenthesis::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "unexpected token at " << pos << std::endl;
+        pos.eprint(log);
+        std::cerr << "note: parenthesis opened at " << open << std::endl;
+        open.eprint(log);
     }
     void EmptyParenthesis::eprint(const std::vector<std::string> &log) const {
         std::cerr << "empty parenthesis (opened at " << pos << ")" << std::endl;
