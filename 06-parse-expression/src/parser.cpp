@@ -44,7 +44,8 @@ namespace parser {
         while(true){
             auto &token_ref = lexer.peek();
             if(token_ref && token_ref->is_opening_parenthesis()){
-                pos::Range pos = lexer.next()->pos;
+                lexer.next();
+                pos::Range pos = ret->pos;
                 auto arguments = parse_arguments(lexer);
                 auto close = lexer.next();
                 if(!close) throw error::make<error::NoClosingParenthesis>(std::move(pos));
