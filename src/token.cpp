@@ -12,15 +12,15 @@ namespace token {
     std::optional<std::string> Token::identifier(){ return std::nullopt; }
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
 
-    std::unique_ptr<syntax::type::Type> Token::type_name(){
+    std::unique_ptr<type::Type> Token::type_name(){
         return nullptr;
     }
-    std::unique_ptr<syntax::type::Type> Identifier::type_name(){
-        std::unique_ptr<syntax::type::Type> ret;
+    std::unique_ptr<type::Type> Identifier::type_name(){
+        std::unique_ptr<type::Type> ret;
         if(name == "integer"){
-            ret = std::make_unique<syntax::type::Integer>();
+            ret = std::make_unique<type::Integer>();
         }else if(name == "boolean"){
-            ret = std::make_unique<syntax::type::Boolean>();
+            ret = std::make_unique<type::Boolean>();
         }else{
             return nullptr;
         }
@@ -71,7 +71,7 @@ namespace token {
 }
 
 namespace token {
-    using syntax::expression::UnaryOperator;
+    using expression::UnaryOperator;
 
     std::optional<UnaryOperator> Token::prefix(){ return std::nullopt; }
     std::optional<UnaryOperator> Plus::prefix(){ return UnaryOperator::Plus; }
@@ -80,7 +80,7 @@ namespace token {
     std::optional<UnaryOperator> Exclamation::prefix(){ return UnaryOperator::LogicalNot; }
 }
 namespace token {
-    using syntax::expression::BinaryOperator;
+    using expression::BinaryOperator;
 
     std::optional<BinaryOperator> Token::binary_operator(){ return std::nullopt; }
     std::optional<BinaryOperator> Plus::binary_operator(){ return BinaryOperator::Add; }
