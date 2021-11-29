@@ -12,6 +12,22 @@ namespace token {
     std::optional<std::string> Token::identifier(){ return std::nullopt; }
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
 
+    std::unique_ptr<syntax::type::Type> Token::type_name(){
+        return nullptr;
+    }
+    std::unique_ptr<syntax::type::Type> Identifier::type_name(){
+        std::unique_ptr<syntax::type::Type> ret;
+        if(name == "integer"){
+            ret = std::make_unique<syntax::type::Integer>();
+        }else if(name == "boolean"){
+            ret = std::make_unique<syntax::type::Boolean>();
+        }else{
+            return nullptr;
+        }
+        ret->pos = pos;
+        return ret;
+    }
+
     using safe_i32 = boost::safe_numerics::safe<std::int32_t>;
     std::optional<std::int32_t> Token::positive_integer(){
         return std::nullopt;
@@ -40,49 +56,62 @@ namespace token {
         return ret;
     }
 
-    std::optional<syntax::UnaryOperator> Token::prefix(){ return std::nullopt; }
-    std::optional<syntax::UnaryOperator> Plus::prefix(){ return syntax::UnaryOperator::Plus; }
-    std::optional<syntax::UnaryOperator> Hyphen::prefix(){ return syntax::UnaryOperator::Minus; }
-    std::optional<syntax::UnaryOperator> Tilde::prefix(){ return syntax::UnaryOperator::BitNot; }
-    std::optional<syntax::UnaryOperator> Exclamation::prefix(){ return syntax::UnaryOperator::LogicalNot; }
-
-    std::optional<syntax::BinaryOperator> Token::binary_operator(){ return std::nullopt; }
-    std::optional<syntax::BinaryOperator> Plus::binary_operator(){ return syntax::BinaryOperator::Add; }
-    std::optional<syntax::BinaryOperator> PlusEqual::binary_operator(){ return syntax::BinaryOperator::AddAssign; }
-    std::optional<syntax::BinaryOperator> Hyphen::binary_operator(){ return syntax::BinaryOperator::Sub; }
-    std::optional<syntax::BinaryOperator> HyphenEqual::binary_operator(){ return syntax::BinaryOperator::SubAssign; }
-    std::optional<syntax::BinaryOperator> Asterisk::binary_operator(){ return syntax::BinaryOperator::Mul; }
-    std::optional<syntax::BinaryOperator> AsteriskEqual::binary_operator(){ return syntax::BinaryOperator::MulAssign; }
-    std::optional<syntax::BinaryOperator> Slash::binary_operator(){ return syntax::BinaryOperator::Div; }
-    std::optional<syntax::BinaryOperator> SlashEqual::binary_operator(){ return syntax::BinaryOperator::DivAssign; }
-    std::optional<syntax::BinaryOperator> Percent::binary_operator(){ return syntax::BinaryOperator::Rem; }
-    std::optional<syntax::BinaryOperator> PercentEqual::binary_operator(){ return syntax::BinaryOperator::RemAssign; }
-    std::optional<syntax::BinaryOperator> Ampersand::binary_operator(){ return syntax::BinaryOperator::BitAnd; }
-    std::optional<syntax::BinaryOperator> AmpersandEqual::binary_operator(){ return syntax::BinaryOperator::BitAndAssign; }
-    std::optional<syntax::BinaryOperator> DoubleAmpersand::binary_operator(){ return syntax::BinaryOperator::LogicalAnd; }
-    std::optional<syntax::BinaryOperator> Bar::binary_operator(){ return syntax::BinaryOperator::BitOr; }
-    std::optional<syntax::BinaryOperator> BarEqual::binary_operator(){ return syntax::BinaryOperator::BitOrAssign; }
-    std::optional<syntax::BinaryOperator> DoubleBar::binary_operator(){ return syntax::BinaryOperator::LogicalOr; }
-    std::optional<syntax::BinaryOperator> Circumflex::binary_operator(){ return syntax::BinaryOperator::BitXor; }
-    std::optional<syntax::BinaryOperator> CircumflexEqual::binary_operator(){ return syntax::BinaryOperator::BitXorAssign; }
-    std::optional<syntax::BinaryOperator> Equal::binary_operator(){ return syntax::BinaryOperator::Assign; }
-    std::optional<syntax::BinaryOperator> DoubleEqual::binary_operator(){ return syntax::BinaryOperator::Equal; }
-    std::optional<syntax::BinaryOperator> ExclamationEqual::binary_operator(){ return syntax::BinaryOperator::NotEqual; }
-    std::optional<syntax::BinaryOperator> Less::binary_operator(){ return syntax::BinaryOperator::Less; }
-    std::optional<syntax::BinaryOperator> LessEqual::binary_operator(){ return syntax::BinaryOperator::LessEqual; }
-    std::optional<syntax::BinaryOperator> DoubleLess::binary_operator(){ return syntax::BinaryOperator::LeftShift; }
-    std::optional<syntax::BinaryOperator> DoubleLessEqual::binary_operator(){ return syntax::BinaryOperator::LeftShiftAssign; }
-    std::optional<syntax::BinaryOperator> Greater::binary_operator(){ return syntax::BinaryOperator::Greater; }
-    std::optional<syntax::BinaryOperator> GreaterEqual::binary_operator(){ return syntax::BinaryOperator::GreaterEqual; }
-    std::optional<syntax::BinaryOperator> DoubleGreater::binary_operator(){ return syntax::BinaryOperator::RightShift; }
-    std::optional<syntax::BinaryOperator> DoubleGreaterEqual::binary_operator(){ return syntax::BinaryOperator::RightShiftAssign; }
-
     bool Token::is_opening_parenthesis(){ return false; }
     bool OpeningParenthesis::is_opening_parenthesis(){ return true; }
     bool Token::is_closing_parenthesis(){ return false; }
     bool ClosingParenthesis::is_closing_parenthesis(){ return true; }
     bool Token::is_comma(){ return false; }
     bool Comma::is_comma(){ return true; }
+    bool Token::is_semicolon(){ return false; }
+    bool Semicolon::is_semicolon(){ return true; }
+    bool Token::is_colon(){ return false; }
+    bool Colon::is_colon(){ return true; }
+    bool Token::is_equal(){ return false; }
+    bool Equal::is_equal(){ return true; }
+}
+
+namespace token {
+    using syntax::expression::UnaryOperator;
+
+    std::optional<UnaryOperator> Token::prefix(){ return std::nullopt; }
+    std::optional<UnaryOperator> Plus::prefix(){ return UnaryOperator::Plus; }
+    std::optional<UnaryOperator> Hyphen::prefix(){ return UnaryOperator::Minus; }
+    std::optional<UnaryOperator> Tilde::prefix(){ return UnaryOperator::BitNot; }
+    std::optional<UnaryOperator> Exclamation::prefix(){ return UnaryOperator::LogicalNot; }
+}
+namespace token {
+    using syntax::expression::BinaryOperator;
+
+    std::optional<BinaryOperator> Token::binary_operator(){ return std::nullopt; }
+    std::optional<BinaryOperator> Plus::binary_operator(){ return BinaryOperator::Add; }
+    std::optional<BinaryOperator> PlusEqual::binary_operator(){ return BinaryOperator::AddAssign; }
+    std::optional<BinaryOperator> Hyphen::binary_operator(){ return BinaryOperator::Sub; }
+    std::optional<BinaryOperator> HyphenEqual::binary_operator(){ return BinaryOperator::SubAssign; }
+    std::optional<BinaryOperator> Asterisk::binary_operator(){ return BinaryOperator::Mul; }
+    std::optional<BinaryOperator> AsteriskEqual::binary_operator(){ return BinaryOperator::MulAssign; }
+    std::optional<BinaryOperator> Slash::binary_operator(){ return BinaryOperator::Div; }
+    std::optional<BinaryOperator> SlashEqual::binary_operator(){ return BinaryOperator::DivAssign; }
+    std::optional<BinaryOperator> Percent::binary_operator(){ return BinaryOperator::Rem; }
+    std::optional<BinaryOperator> PercentEqual::binary_operator(){ return BinaryOperator::RemAssign; }
+    std::optional<BinaryOperator> Ampersand::binary_operator(){ return BinaryOperator::BitAnd; }
+    std::optional<BinaryOperator> AmpersandEqual::binary_operator(){ return BinaryOperator::BitAndAssign; }
+    std::optional<BinaryOperator> DoubleAmpersand::binary_operator(){ return BinaryOperator::LogicalAnd; }
+    std::optional<BinaryOperator> Bar::binary_operator(){ return BinaryOperator::BitOr; }
+    std::optional<BinaryOperator> BarEqual::binary_operator(){ return BinaryOperator::BitOrAssign; }
+    std::optional<BinaryOperator> DoubleBar::binary_operator(){ return BinaryOperator::LogicalOr; }
+    std::optional<BinaryOperator> Circumflex::binary_operator(){ return BinaryOperator::BitXor; }
+    std::optional<BinaryOperator> CircumflexEqual::binary_operator(){ return BinaryOperator::BitXorAssign; }
+    std::optional<BinaryOperator> Equal::binary_operator(){ return BinaryOperator::Assign; }
+    std::optional<BinaryOperator> DoubleEqual::binary_operator(){ return BinaryOperator::Equal; }
+    std::optional<BinaryOperator> ExclamationEqual::binary_operator(){ return BinaryOperator::NotEqual; }
+    std::optional<BinaryOperator> Less::binary_operator(){ return BinaryOperator::Less; }
+    std::optional<BinaryOperator> LessEqual::binary_operator(){ return BinaryOperator::LessEqual; }
+    std::optional<BinaryOperator> DoubleLess::binary_operator(){ return BinaryOperator::LeftShift; }
+    std::optional<BinaryOperator> DoubleLessEqual::binary_operator(){ return BinaryOperator::LeftShiftAssign; }
+    std::optional<BinaryOperator> Greater::binary_operator(){ return BinaryOperator::Greater; }
+    std::optional<BinaryOperator> GreaterEqual::binary_operator(){ return BinaryOperator::GreaterEqual; }
+    std::optional<BinaryOperator> DoubleGreater::binary_operator(){ return BinaryOperator::RightShift; }
+    std::optional<BinaryOperator> DoubleGreaterEqual::binary_operator(){ return BinaryOperator::RightShiftAssign; }
 }
 
 #define define_debug_print(name) \
