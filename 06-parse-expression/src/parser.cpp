@@ -6,42 +6,60 @@ namespace parser {
     static std::vector<std::unique_ptr<syntax::Expression>> parse_arguments(lexer::Lexer &);
 
     std::unique_ptr<syntax::Expression> parse_factor(lexer::Lexer &lexer){
-        auto &token_ref = lexer.peek();
-        if(!token_ref) return nullptr;
-
         std::unique_ptr<syntax::Expression> ret;
-        pos::Range pos;
-        if(auto name = token_ref->identifier()){
-            pos = lexer.next()->pos;
-            ret = std::make_unique<syntax::Identifier>(std::move(name).value());
-        }else if(auto value = token_ref->positive_integer()){
-            pos = lexer.next()->pos;
-            ret = std::make_unique<syntax::Integer>(value.value());
-        }else if(auto prefix = token_ref->prefix()){
-            pos = lexer.next()->pos;
-            if(prefix.value() == syntax::UnaryOperator::Minus && (value = lexer.peek()->negative_integer())){
-                pos += lexer.next()->pos;
+        {
+            auto &token_ref = lexer.peek();
+            if(!token_ref) return nullptr;
+
+            pos::Range pos;
+            if(auto name = token_ref->identifier()){
+                pos = lexer.next()->pos;
+                ret = std::make_unique<syntax::Identifier>(std::move(name).value());
+            }else if(auto value = token_ref->positive_integer()){
+                pos = lexer.next()->pos;
                 ret = std::make_unique<syntax::Integer>(value.value());
+            }else if(auto prefix = token_ref->prefix()){
+                pos = lexer.next()->pos;
+                if(prefix.value() == syntax::UnaryOperator::Minus && (value = lexer.peek()->negative_integer())){
+                    pos += lexer.next()->pos;
+                    ret = std::make_unique<syntax::Integer>(value.value());
+                }else{
+                    auto operand = parse_factor(lexer);
+                    pos += operand->pos;
+                    ret = std::make_unique<syntax::Unary>(prefix.value(), std::move(operand));
+                }
+            }else if(token_ref->is_opening_parenthesis()){
+                pos = lexer.next()->pos;
+                ret = parse_expression(lexer);
+                if(!ret) throw error::make<error::EmptyParenthesis>(std::move(pos));
+                auto close = lexer.next();
+                if(close && close->is_closing_parenthesis()){
+                    pos += close->pos;
+                }else{
+                    throw error::make<error::NoClosingParenthesis>(std::move(pos));
+                }
             }else{
-                auto operand = parse_factor(lexer);
-                pos += operand->pos;
-                ret = std::make_unique<syntax::Unary>(prefix.value(), std::move(operand));
+                return nullptr;
             }
-        }else if(token_ref->is_opening_parenthesis()){
-            pos = lexer.next()->pos;
-            ret = parse_expression(lexer);
-            if(!ret) throw error::make<error::EmptyParenthesis>(std::move(pos));
-            auto close = lexer.next();
-            if(close && close->is_closing_parenthesis()){
-                pos += close->pos;
-            }else{
-                throw error::make<error::NoClosingParenthesis>(std::move(pos));
-            }
-        }else{
-            return nullptr;
+            ret->pos = pos;
         }
-        ret->pos = pos;
-        return ret;
+        while(true){
+            auto &token_ref = lexer.peek();
+            if(token_ref && token_ref->is_opening_parenthesis()){
+                pos::Range pos = lexer.next()->pos;
+                auto arguments = parse_arguments(lexer);
+                auto close = lexer.next();
+                if(close && close->is_closing_parenthesis()){
+                    ret = std::make_unique<syntax::Invocation>(std::move(ret), std::move(arguments));
+                    pos += close->pos;
+                    ret->pos = pos;
+                }else{
+                    throw error::make<error::NoClosingParenthesis>(std::move(pos));
+                }
+            }else{
+                return ret;
+            }
+        }
     }
 
     enum Precedence {
@@ -135,5 +153,21 @@ namespace parser {
 
     std::unique_ptr<syntax::Expression> parse_expression(lexer::Lexer &lexer){
         return parse_binary_operator(lexer, 0);
+    }
+
+    std::vector<std::unique_ptr<syntax::Expression>> parse_arguments(lexer::Lexer &lexer){
+        std::vector<std::unique_ptr<syntax::Expression>> ret;
+        while(true){
+            auto argument = parse_expression(lexer);
+            auto &token = lexer.peek();
+            if(token->is_comma()){
+                auto pos_comma = lexer.next()->pos;
+                if(!argument) throw error::make<error::EmptyArgument>(std::move(pos_comma));
+                ret.push_back(std::move(argument));
+            }else{
+                if(argument) ret.push_back(std::move(argument));
+                return ret;
+            }
+        }
     }
 }

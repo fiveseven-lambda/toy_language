@@ -19,7 +19,7 @@ namespace token {
         virtual std::optional<std::int32_t> positive_integer(), negative_integer();
         virtual std::optional<syntax::UnaryOperator> prefix();
         virtual std::optional<syntax::BinaryOperator> binary_operator();
-        virtual bool is_opening_parenthesis(), is_closing_parenthesis();
+        virtual bool is_opening_parenthesis(), is_closing_parenthesis(), is_comma();
     };
 
     class Identifier : public Token {
@@ -195,6 +195,7 @@ namespace token {
     };
     class Comma : public Token {
         void debug_print() const override;
+        bool is_comma() override;
     };
 }
 

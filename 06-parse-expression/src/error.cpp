@@ -8,6 +8,7 @@ namespace error {
     NoExpressionAfterOperator::NoExpressionAfterOperator(pos::Range pos): pos(std::move(pos)) {}
     NoClosingParenthesis::NoClosingParenthesis(pos::Range pos): pos(std::move(pos)) {}
     EmptyParenthesis::EmptyParenthesis(pos::Range pos): pos(std::move(pos)) {}
+    EmptyArgument::EmptyArgument(pos::Range pos): pos(std::move(pos)) {}
 
     void UnexpectedCharacter::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected character at " << pos << std::endl;
@@ -34,6 +35,10 @@ namespace error {
     }
     void EmptyParenthesis::eprint(const std::vector<std::string> &log) const {
         std::cerr << "empty parenthesis (opened at " << pos << ")" << std::endl;
+        pos.eprint(log);
+    }
+    void EmptyArgument::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "empty argument in a function call at " << pos << std::endl;
         pos.eprint(log);
     }
 }

@@ -61,6 +61,13 @@ namespace error {
         EmptyParenthesis(pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
+
+    class EmptyArgument: public Error {
+        pos::Range pos;
+    public:
+        EmptyArgument(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
 }
 
 #endif
