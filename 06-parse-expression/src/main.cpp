@@ -9,9 +9,8 @@ int main(){
     lexer::Lexer lexer;
     try{
         while(true){
-            std::unique_ptr<syntax::Expression> expression = parser::parse_factor(lexer);
+            std::unique_ptr<syntax::Expression> expression = parser::parse_expression(lexer);
             if(!expression) break;
-            std::cout << expression->pos << std::endl;
             expression->debug_print();
         }
     }catch(std::unique_ptr<error::Error> &error){

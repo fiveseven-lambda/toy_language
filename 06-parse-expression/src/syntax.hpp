@@ -53,6 +53,7 @@ namespace syntax {
         LogicalAnd, LogicalOr,
         Assign,
         MulAssign, DivAssign, RemAssign, AddAssign, SubAssign,
+        LeftShiftAssign, RightShiftAssign,
         BitAndAssign, BitOrAssign, BitXorAssign
     };
     class Binary : public Expression {

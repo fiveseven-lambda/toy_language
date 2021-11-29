@@ -21,11 +21,11 @@ namespace syntax {
     static constexpr std::string_view INDENT = "    ";
     void Identifier::debug_print(int depth) const {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
-        std::cout << "Identifier(" << name << ")" << std::endl;
+        std::cout << pos << ": Identifier(" << name << ")" << std::endl;
     }
     void Integer::debug_print(int depth) const {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
-        std::cout << "Integer(" << value << ")" << std::endl;
+        std::cout << pos << ": Integer(" << value << ")" << std::endl;
     }
     void Unary::debug_print(int depth) const {
         std::string_view name;
@@ -36,7 +36,7 @@ namespace syntax {
             case UnaryOperator::BitNot: name = "bitwise not";
         }
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
-        std::cout << "Unary(" << name << ")" << std::endl;
+        std::cout << pos << ": Unary(" << name << ")" << std::endl;
         operand->debug_print(depth + 1);
     }
     void Binary::debug_print(int depth) const {
@@ -69,15 +69,17 @@ namespace syntax {
             case BinaryOperator::BitAndAssign: name = "bitwise and assign"; break;
             case BinaryOperator::BitOrAssign: name = "bitwise or assign"; break;
             case BinaryOperator::BitXorAssign: name = "bitwise xor assign"; break;
+            case BinaryOperator::RightShiftAssign: name = "right shift assign"; break;
+            case BinaryOperator::LeftShiftAssign: name = "left shift assign"; break;
         }
-        for(int i = 0; i < depth; ++i) std::cout << INDENT;
-        std::cout << "Binary(" << name << ")" << std::endl;
         left->debug_print(depth + 1);
+        for(int i = 0; i < depth; ++i) std::cout << INDENT;
+        std::cout << pos << ": Binary(" << name << ")" << std::endl;
         right->debug_print(depth + 1);
     }
     void Invocation::debug_print(int depth) const {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
-        std::cout << "Invocation" << std::endl;
+        std::cout << pos << ": Invocation" << std::endl;
         function->debug_print(depth + 1);
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
         std::cout << "arguments: " << std::endl;

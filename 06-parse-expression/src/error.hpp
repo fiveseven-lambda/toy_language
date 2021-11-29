@@ -40,6 +40,27 @@ namespace error {
         InvalidIntegerLiteral(std::exception &, pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
+
+    class NoExpressionAfterOperator : public Error {
+        pos::Range pos;
+    public:
+        NoExpressionAfterOperator(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    class NoClosingParenthesis : public Error {
+        pos::Range pos;
+    public:
+        NoClosingParenthesis(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    class EmptyParenthesis : public Error {
+        pos::Range pos;
+    public:
+        EmptyParenthesis(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
 }
 
 #endif
