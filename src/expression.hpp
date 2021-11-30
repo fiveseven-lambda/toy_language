@@ -15,7 +15,7 @@ namespace expression {
         pos::Range pos;
         virtual ~Expression();
         virtual std::optional<std::string> identifier();
-        virtual void debug_print(int depth = 0) const = 0;
+        virtual void debug_print(int = 0) const = 0;
     };
 
     class Identifier : public Expression {
