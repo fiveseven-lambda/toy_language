@@ -1,5 +1,7 @@
 #include "sentence.hpp"
 
+#include <sstream>
+
 namespace sentence {
     Sentence::~Sentence() = default;
     
@@ -8,6 +10,29 @@ namespace sentence {
         name(std::move(name)),
         type(std::move(type)),
         expression(std::move(expression)) {}
+
+    void Expression::translate(context::Context &context, std::unique_ptr<llvm::Module> &module, std::map<std::string, std::pair<std::shared_ptr<type::Type>, std::size_t>> &global_variables){
+        if(expression){
+            std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> variables;
+            for(auto &[name, variable]: global_variables){
+                std::stringstream number;
+                number << variable.second;
+                llvm::Value *ptr = new llvm::GlobalVariable(
+                    *module,
+                    variable.first->llvm_type(context),
+                    false,
+                    llvm::GlobalValue::ExternalLinkage,
+                    nullptr,
+                    number.str()
+                );
+                variables.emplace(name, std::make_pair(variable.first, ptr));
+            }
+            auto [type, value] = expression->rvalue(context, variables);
+            context.builder.CreateRet(value);
+        }
+    }
+    void Declaration::translate(context::Context &context, std::unique_ptr<llvm::Module> &module, std::map<std::string, std::pair<std::shared_ptr<type::Type>, std::size_t>> &global_variables){
+    }
 
     static constexpr std::string_view INDENT = "    ";
     void Expression::debug_print(int depth) const {

@@ -21,6 +21,19 @@ namespace expression {
     std::optional<std::string> Expression::identifier(){ return std::nullopt; }
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
 
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Identifier::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Identifier::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Integer::rvalue(context::Context &context, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){
+        return {std::make_unique<type::Integer>(), llvm::ConstantInt::get(context.integer_type, value)};
+    }
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Integer::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Unary::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Unary::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Binary::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Binary::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Invocation::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Invocation::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+
     static constexpr std::string_view INDENT = "    ";
     void Identifier::debug_print(int depth) const {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
