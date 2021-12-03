@@ -9,7 +9,7 @@ static std::unique_ptr<expression::Expression>
     parse_binary_operator(Lexer &, int),
     parse_expression(Lexer &);
 static std::vector<std::unique_ptr<expression::Expression>> parse_arguments(Lexer &);
-static std::unique_ptr<type::Type> parse_type(Lexer &);
+static std::shared_ptr<type::Type> parse_type(Lexer &);
 
 std::unique_ptr<expression::Expression> parse_factor(Lexer &lexer){
     std::unique_ptr<expression::Expression> ret;
@@ -174,7 +174,7 @@ std::vector<std::unique_ptr<expression::Expression>> parse_arguments(Lexer &lexe
     }
 }
 
-std::unique_ptr<type::Type> parse_type(Lexer &lexer){
+std::shared_ptr<type::Type> parse_type(Lexer &lexer){
     auto &token_ref = lexer.peek();
     if(!token_ref) return nullptr;
     auto type = token_ref->type_name();

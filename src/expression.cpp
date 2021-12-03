@@ -21,13 +21,39 @@ namespace expression {
     std::optional<std::string> Expression::identifier(){ return std::nullopt; }
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
 
-    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Identifier::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Identifier::rvalue(context::Context &context, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &variables){
+        auto [type, value] = variables.find(name)->second;
+        return {type, context.builder.CreateLoad(type->llvm_type(context), value)};
+    }
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Identifier::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Integer::rvalue(context::Context &context, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){
         return {std::make_unique<type::Integer>(), llvm::ConstantInt::get(context.integer_type, value)};
     }
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Integer::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
-    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Unary::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Unary::rvalue(context::Context &context, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &variables){
+        auto [operand_type, operand_rvalue] = operand->rvalue(context, variables);
+        std::shared_ptr<type::Type> type;
+        switch(unary_operator){
+            case UnaryOperator::LogicalNot:
+                type = std::make_shared<type::Boolean>();
+                break;
+            case UnaryOperator::Plus:
+            case UnaryOperator::Minus:
+            case UnaryOperator::BitNot:
+                type = std::make_shared<type::Integer>();
+        }
+        auto converted_operand = type->convert_from(operand_type, operand_rvalue, context);
+        switch(unary_operator){
+            case UnaryOperator::LogicalNot:
+                return {type, context.builder.CreateNot(converted_operand)};
+            case UnaryOperator::Plus:
+                return {type, converted_operand};
+            case UnaryOperator::Minus:
+                return {type, context.builder.CreateNSWSub(llvm::ConstantInt::get(context.integer_type, 0), converted_operand)};
+            case UnaryOperator::BitNot:
+                return {type, context.builder.CreateXor(converted_operand, llvm::ConstantInt::get(context.integer_type, -1))};
+        }
+    }
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Unary::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Binary::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Binary::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}

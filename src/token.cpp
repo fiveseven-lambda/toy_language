@@ -12,15 +12,15 @@ namespace token {
     std::optional<std::string> Token::identifier(){ return std::nullopt; }
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
 
-    std::unique_ptr<type::Type> Token::type_name(){
+    std::shared_ptr<type::Type> Token::type_name(){
         return nullptr;
     }
-    std::unique_ptr<type::Type> Identifier::type_name(){
-        std::unique_ptr<type::Type> ret;
+    std::shared_ptr<type::Type> Identifier::type_name(){
+        std::shared_ptr<type::Type> ret;
         if(name == "integer"){
-            ret = std::make_unique<type::Integer>();
+            ret = std::make_shared<type::Integer>();
         }else if(name == "boolean"){
-            ret = std::make_unique<type::Boolean>();
+            ret = std::make_shared<type::Boolean>();
         }else{
             return nullptr;
         }

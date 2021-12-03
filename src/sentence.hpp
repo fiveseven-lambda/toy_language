@@ -31,10 +31,10 @@ namespace sentence {
 
     class Declaration : public Sentence {
         std::string name;
-        std::unique_ptr<type::Type> type;
+        std::shared_ptr<type::Type> type;
         std::unique_ptr<expression::Expression> expression;
     public:
-        Declaration(std::string, std::unique_ptr<type::Type>, std::unique_ptr<expression::Expression>);
+        Declaration(std::string, std::shared_ptr<type::Type>, std::unique_ptr<expression::Expression>);
         void translate(context::Context &, std::unique_ptr<llvm::Module> &, std::map<std::string, std::pair<std::shared_ptr<type::Type>, std::size_t>> &) override;
         void debug_print(int) const override;
     };

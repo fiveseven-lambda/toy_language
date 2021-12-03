@@ -11,7 +11,7 @@ namespace context {
     struct Context {
         llvm::orc::ThreadSafeContext context;
         llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter> builder;
-        llvm::Type *boolean_type, *integer_type;
+        llvm::Type *boolean_type, *integer_type, *void_type;
         llvm::FunctionType *function_type;
         Context();
     };

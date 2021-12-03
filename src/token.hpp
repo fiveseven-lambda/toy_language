@@ -16,7 +16,7 @@ namespace token {
         pos::Range pos;
         virtual ~Token();
         virtual std::optional<std::string> identifier();
-        virtual std::unique_ptr<type::Type> type_name();
+        virtual std::shared_ptr<type::Type> type_name();
         virtual std::optional<std::int32_t> positive_integer(), negative_integer();
         virtual std::optional<expression::UnaryOperator> prefix();
         virtual std::optional<expression::BinaryOperator> binary_operator();
@@ -39,7 +39,7 @@ namespace token {
     public:
         Identifier(std::string);
         std::optional<std::string> identifier() override;
-        std::unique_ptr<type::Type> type_name() override;
+        std::shared_ptr<type::Type> type_name() override;
     };
 
     class Integer : public Token {
