@@ -25,7 +25,9 @@ namespace expression {
         auto [type, value] = variables.find(name)->second;
         return {type, context.builder.CreateLoad(type->llvm_type(context), value)};
     }
-    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Identifier::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Identifier::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &variables){
+        return variables.find(name)->second;
+    }
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Integer::rvalue(context::Context &context, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){
         return {std::make_unique<type::Integer>(), llvm::ConstantInt::get(context.integer_type, value)};
     }
@@ -55,40 +57,59 @@ namespace expression {
         }
     }
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Unary::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+
+    template<class... T>
+    constexpr int binary_operator_category(T... operators){
+        int ret = 0;
+        for(BinaryOperator binary_operator : std::initializer_list<BinaryOperator>{operators...}){
+            ret |= 1 << static_cast<int>(binary_operator);
+        }
+        return ret;
+    }
+
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Binary::rvalue(context::Context &context, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &variables){
-        constexpr int lvalue_operations = 
-            1 << static_cast<int>(BinaryOperator::Assign)
-            | 1 << static_cast<int>(BinaryOperator::MulAssign)
-            | 1 << static_cast<int>(BinaryOperator::DivAssign)
-            | 1 << static_cast<int>(BinaryOperator::RemAssign)
-            | 1 << static_cast<int>(BinaryOperator::AddAssign)
-            | 1 << static_cast<int>(BinaryOperator::SubAssign)
-            | 1 << static_cast<int>(BinaryOperator::LeftShiftAssign)
-            | 1 << static_cast<int>(BinaryOperator::RightShiftAssign)
-            | 1 << static_cast<int>(BinaryOperator::BitAndAssign)
-            | 1 << static_cast<int>(BinaryOperator::BitOrAssign)
-            | 1 << static_cast<int>(BinaryOperator::BitXorAssign);
+        constexpr int lvalue_operations = binary_operator_category(
+            BinaryOperator::Assign,
+            BinaryOperator::AddAssign,
+            BinaryOperator::SubAssign,
+            BinaryOperator::MulAssign,
+            BinaryOperator::DivAssign,
+            BinaryOperator::RemAssign,
+            BinaryOperator::LeftShiftAssign,
+            BinaryOperator::RightShiftAssign,
+            BinaryOperator::BitAndAssign,
+            BinaryOperator::BitOrAssign,
+            BinaryOperator::BitXorAssign
+        );
         if(lvalue_operations >> static_cast<int>(binary_operator) & 1){
+            auto [left_type, left_value] = left->lvalue(context, variables);
+            auto [right_type, right_value] = right->rvalue(context, variables);
+            auto converted_right_value = left_type->convert_from(right_type, right_value, context);
+            switch(binary_operator){
+                case BinaryOperator::Assign:
+                    return {left_type, context.builder.CreateStore(converted_right_value, left_value)};
+            }
         }else{
             auto [left_type, left_value] = left->rvalue(context, variables);
             auto [right_type, right_value] = right->rvalue(context, variables);
-            constexpr int integer_operations = 
-                1 << static_cast<int>(BinaryOperator::Add)
-                | 1 << static_cast<int>(BinaryOperator::Sub)
-                | 1 << static_cast<int>(BinaryOperator::Mul)
-                | 1 << static_cast<int>(BinaryOperator::Div)
-                | 1 << static_cast<int>(BinaryOperator::Rem)
-                | 1 << static_cast<int>(BinaryOperator::LeftShift)
-                | 1 << static_cast<int>(BinaryOperator::RightShift)
-                | 1 << static_cast<int>(BinaryOperator::BitAnd)
-                | 1 << static_cast<int>(BinaryOperator::BitOr)
-                | 1 << static_cast<int>(BinaryOperator::BitXor)
-                | 1 << static_cast<int>(BinaryOperator::Equal)
-                | 1 << static_cast<int>(BinaryOperator::NotEqual)
-                | 1 << static_cast<int>(BinaryOperator::Less)
-                | 1 << static_cast<int>(BinaryOperator::Greater)
-                | 1 << static_cast<int>(BinaryOperator::LessEqual)
-                | 1 << static_cast<int>(BinaryOperator::GreaterEqual);
+            constexpr int integer_operations = binary_operator_category(
+                BinaryOperator::Add,
+                BinaryOperator::Sub,
+                BinaryOperator::Mul,
+                BinaryOperator::Div,
+                BinaryOperator::Rem,
+                BinaryOperator::LeftShift,
+                BinaryOperator::RightShift,
+                BinaryOperator::BitAnd,
+                BinaryOperator::BitOr,
+                BinaryOperator::BitXor,
+                BinaryOperator::Equal,
+                BinaryOperator::NotEqual,
+                BinaryOperator::Less,
+                BinaryOperator::Greater,
+                BinaryOperator::LessEqual,
+                BinaryOperator::GreaterEqual
+            );
             if(integer_operations >> static_cast<int>(binary_operator) & 1){
                 auto integer_type = std::make_shared<type::Integer>();
                 auto boolean_type = std::make_shared<type::Boolean>();
