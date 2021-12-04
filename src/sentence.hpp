@@ -9,6 +9,7 @@
 #include "expression.hpp"
 #include "type.hpp"
 #include "context.hpp"
+#include "global_variables.hpp"
 
 #include "llvm/IR/Module.h"
 
@@ -17,7 +18,7 @@ namespace sentence {
     public:
         pos::Range pos;
         virtual ~Sentence();
-        virtual void translate(context::Context &, std::unique_ptr<llvm::Module> &, std::map<std::string, std::pair<std::shared_ptr<type::Type>, std::size_t>> &) = 0;
+        virtual void translate(context::Context &, std::unique_ptr<llvm::Module> &, global_variables::GlobalVariables &) = 0;
         virtual void debug_print(int = 0) const = 0;
     };
 
@@ -25,7 +26,7 @@ namespace sentence {
         std::unique_ptr<expression::Expression> expression;
     public:
         Expression(std::unique_ptr<expression::Expression>);
-        void translate(context::Context &, std::unique_ptr<llvm::Module> &, std::map<std::string, std::pair<std::shared_ptr<type::Type>, std::size_t>> &) override;
+        void translate(context::Context &, std::unique_ptr<llvm::Module> &, global_variables::GlobalVariables &) override;
         void debug_print(int) const override;
     };
 
@@ -35,7 +36,7 @@ namespace sentence {
         std::unique_ptr<expression::Expression> expression;
     public:
         Declaration(std::string, std::shared_ptr<type::Type>, std::unique_ptr<expression::Expression>);
-        void translate(context::Context &, std::unique_ptr<llvm::Module> &, std::map<std::string, std::pair<std::shared_ptr<type::Type>, std::size_t>> &) override;
+        void translate(context::Context &, std::unique_ptr<llvm::Module> &, global_variables::GlobalVariables &) override;
         void debug_print(int) const override;
     };
 }

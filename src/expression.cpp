@@ -55,7 +55,72 @@ namespace expression {
         }
     }
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Unary::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
-    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Binary::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
+    std::pair<std::shared_ptr<type::Type>, llvm::Value *> Binary::rvalue(context::Context &context, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &variables){
+        constexpr int lvalue_operations = 
+            1 << static_cast<int>(BinaryOperator::Assign)
+            | 1 << static_cast<int>(BinaryOperator::MulAssign)
+            | 1 << static_cast<int>(BinaryOperator::DivAssign)
+            | 1 << static_cast<int>(BinaryOperator::RemAssign)
+            | 1 << static_cast<int>(BinaryOperator::AddAssign)
+            | 1 << static_cast<int>(BinaryOperator::SubAssign)
+            | 1 << static_cast<int>(BinaryOperator::LeftShiftAssign)
+            | 1 << static_cast<int>(BinaryOperator::RightShiftAssign)
+            | 1 << static_cast<int>(BinaryOperator::BitAndAssign)
+            | 1 << static_cast<int>(BinaryOperator::BitOrAssign)
+            | 1 << static_cast<int>(BinaryOperator::BitXorAssign);
+        if(lvalue_operations >> static_cast<int>(binary_operator) & 1){
+        }else{
+            auto [left_type, left_value] = left->rvalue(context, variables);
+            auto [right_type, right_value] = right->rvalue(context, variables);
+            constexpr int integer_operations = 
+                1 << static_cast<int>(BinaryOperator::Add)
+                | 1 << static_cast<int>(BinaryOperator::Sub)
+                | 1 << static_cast<int>(BinaryOperator::Mul)
+                | 1 << static_cast<int>(BinaryOperator::Div)
+                | 1 << static_cast<int>(BinaryOperator::Rem)
+                | 1 << static_cast<int>(BinaryOperator::LeftShift)
+                | 1 << static_cast<int>(BinaryOperator::RightShift)
+                | 1 << static_cast<int>(BinaryOperator::BitAnd)
+                | 1 << static_cast<int>(BinaryOperator::BitOr)
+                | 1 << static_cast<int>(BinaryOperator::BitXor)
+                | 1 << static_cast<int>(BinaryOperator::Equal)
+                | 1 << static_cast<int>(BinaryOperator::NotEqual)
+                | 1 << static_cast<int>(BinaryOperator::Less)
+                | 1 << static_cast<int>(BinaryOperator::Greater)
+                | 1 << static_cast<int>(BinaryOperator::LessEqual)
+                | 1 << static_cast<int>(BinaryOperator::GreaterEqual);
+            if(integer_operations >> static_cast<int>(binary_operator) & 1){
+                auto integer_type = std::make_shared<type::Integer>();
+                auto boolean_type = std::make_shared<type::Boolean>();
+                auto left = integer_type->convert_from(left_type, left_value, context);
+                auto right = integer_type->convert_from(right_type, right_value, context);
+                switch(binary_operator){
+                    case BinaryOperator::Add:
+                        return {integer_type, context.builder.CreateNSWAdd(left, right)};
+                    case BinaryOperator::Sub:
+                        return {integer_type, context.builder.CreateNSWSub(left, right)};
+                    case BinaryOperator::Mul:
+                        return {integer_type, context.builder.CreateNSWMul(left, right)};
+                    case BinaryOperator::Div:
+                        return {integer_type, context.builder.CreateExactSDiv(left, right)};
+                    case BinaryOperator::Rem:
+                        return {integer_type, context.builder.CreateSRem(left, right)};
+                    case BinaryOperator::Equal:
+                        return {boolean_type, context.builder.CreateICmpEQ(left, right)};
+                    case BinaryOperator::NotEqual:
+                        return {boolean_type, context.builder.CreateICmpNE(left, right)};
+                    case BinaryOperator::Less:
+                        return {boolean_type, context.builder.CreateICmpSLT(left, right)};
+                    case BinaryOperator::Greater:
+                        return {boolean_type, context.builder.CreateICmpSGT(left, right)};
+                    case BinaryOperator::LessEqual:
+                        return {boolean_type, context.builder.CreateICmpSLE(left, right)};
+                    case BinaryOperator::GreaterEqual:
+                        return {boolean_type, context.builder.CreateICmpSGE(left, right)};
+                }
+            }
+        }
+    }
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Binary::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Invocation::rvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}
     std::pair<std::shared_ptr<type::Type>, llvm::Value *> Invocation::lvalue(context::Context &, const std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> &){}

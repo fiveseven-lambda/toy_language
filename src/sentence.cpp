@@ -11,45 +11,18 @@ namespace sentence {
         type(std::move(type)),
         expression(std::move(expression)) {}
 
-    void Expression::translate(context::Context &context, std::unique_ptr<llvm::Module> &module, std::map<std::string, std::pair<std::shared_ptr<type::Type>, std::size_t>> &global_variables){
+    void Expression::translate(context::Context &context, std::unique_ptr<llvm::Module> &module, global_variables::GlobalVariables &global_variables){
         if(expression){
-            std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> variables;
-            for(auto &[name, variable]: global_variables){
-                std::stringstream number;
-                number << "v" << variable.second;
-                llvm::Value *ptr = new llvm::GlobalVariable(
-                    *module,
-                    variable.first->llvm_type(context),
-                    false,
-                    llvm::GlobalValue::ExternalLinkage,
-                    nullptr,
-                    number.str()
-                );
-                variables.emplace(name, std::make_pair(variable.first, ptr));
-            }
-            auto [type, value] = expression->rvalue(context, variables);
-            context.builder.CreateRet(value);
-            // context.builder.CreateRetVoid();
+            auto variables = global_variables.variables(context, module);
+            expression->rvalue(context, variables);
+            context.builder.CreateRetVoid();
         }
     }
-    void Declaration::translate(context::Context &context, std::unique_ptr<llvm::Module> &module, std::map<std::string, std::pair<std::shared_ptr<type::Type>, std::size_t>> &global_variables){
+    void Declaration::translate(context::Context &context, std::unique_ptr<llvm::Module> &module, global_variables::GlobalVariables &global_variables){
         std::shared_ptr<type::Type> rhs_type;
         llvm::Value *rhs_value;
         if(expression){
-            std::map<std::string, std::pair<std::shared_ptr<type::Type>, llvm::Value *>> variables;
-            for(auto &[key, variable]: global_variables){
-                std::stringstream number;
-                number << "v" << variable.second;
-                llvm::Value *ptr = new llvm::GlobalVariable(
-                    *module,
-                    variable.first->llvm_type(context),
-                    false,
-                    llvm::GlobalValue::ExternalLinkage,
-                    nullptr,
-                    number.str()
-                );
-                variables.emplace(key, std::make_pair(variable.first, ptr));
-            }
+            auto variables = global_variables.variables(context, module);
             std::tie(rhs_type, rhs_value) = expression->rvalue(context, variables);
         }
         if(type){
@@ -59,15 +32,13 @@ namespace sentence {
         }else{
             type = rhs_type;
         }
-        // ここで番号付けに size を取るのは間違っている（同名の変数が複数個宣言された場合）
-        std::size_t next_number = global_variables.size();
-        std::stringstream next_number_string;
-        next_number_string << "v" << next_number;
-        auto variable = new llvm::GlobalVariable(*module.get(), type->llvm_type(context), false, llvm::GlobalValue::CommonLinkage, type->default_value(context), next_number_string.str());
+        std::size_t number = global_variables.insert(name, type);
+        std::stringstream llvm_name;
+        llvm_name << "v" << number;
+        auto variable = new llvm::GlobalVariable(*module.get(), type->llvm_type(context), false, llvm::GlobalValue::CommonLinkage, type->default_value(context), llvm_name.str());
         if(expression){
             context.builder.CreateStore(rhs_value, variable);
         }
-        global_variables[name] = std::make_pair(type, next_number);
     }
 
     static constexpr std::string_view INDENT = "    ";

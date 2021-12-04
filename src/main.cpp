@@ -13,7 +13,7 @@ int main(){
         while(true){
             std::unique_ptr<sentence::Sentence> sentence = parse_sentence(lexer);
             if(!sentence) break;
-            sentence->debug_print();
+            // sentence->debug_print();
             environment.run(sentence);
         }
     }catch(std::unique_ptr<error::Error> &error){
