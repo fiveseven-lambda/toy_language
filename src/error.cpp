@@ -10,6 +10,7 @@ namespace error {
     UnexpectedTokenInParenthesis::UnexpectedTokenInParenthesis(pos::Range pos, pos::Range open): pos(std::move(pos)), open(std::move(open)) {}
     EmptyParenthesis::EmptyParenthesis(pos::Range pos): pos(std::move(pos)) {}
     EmptyArgument::EmptyArgument(pos::Range pos): pos(std::move(pos)) {}
+    LLVMError::LLVMError(llvm::Error error): error(std::move(error)) {}
 
     void UnexpectedCharacter::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected character at " << pos << std::endl;
@@ -47,5 +48,9 @@ namespace error {
     void EmptyArgument::eprint(const std::vector<std::string> &log) const {
         std::cerr << "empty argument in a function call at " << pos << std::endl;
         pos.eprint(log);
+    }
+    void LLVMError::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "internal error" << std::endl;
+        llvm::errs() << error << '\n';
     }
 }

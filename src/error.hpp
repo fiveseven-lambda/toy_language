@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "pos.hpp"
+#include "llvm/Support/Error.h"
 
 namespace error {
     class Error {
@@ -73,6 +74,13 @@ namespace error {
         pos::Range pos;
     public:
         EmptyArgument(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    class LLVMError: public Error {
+        llvm::Error error;
+    public:
+        LLVMError(llvm::Error);
         void eprint(const std::vector<std::string> &) const override;
     };
 }

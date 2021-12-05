@@ -39,6 +39,7 @@ namespace sentence {
         if(expression){
             context.builder.CreateStore(rhs_value, variable);
         }
+        context.builder.CreateRetVoid();
     }
 
     static constexpr std::string_view INDENT = "    ";

@@ -2,11 +2,16 @@
 
 #include <sstream>
 
+#include "error.hpp"
 #include "llvm/IR/Module.h"
+#include "llvm/ExecutionEngine/Orc/LLJIT.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
 
 namespace environment {
     Environment::Environment(): counter(0) {
-        // jit の初期化
+        LLVMInitializeNativeTarget();
+        jit = std::move(llvm::orc::LLJITBuilder().create().get());
+        LLVMInitializeNativeAsmPrinter();
     }
     int Environment::run(std::unique_ptr<sentence::Sentence> &sentence){
         std::stringstream counter_name;
@@ -17,6 +22,15 @@ namespace environment {
         context.builder.SetInsertPoint(basic_block);
         sentence->translate(context, module, global_variables);
         module->print(llvm::errs(), nullptr);
+        if(auto error = jit->addIRModule(llvm::orc::ThreadSafeModule(std::move(module), context.context))){
+            throw error::make<error::LLVMError>(std::move(error));
+        }
+        if(auto result = jit->lookup(counter_name.str())){
+            auto compiled_function = reinterpret_cast<void(*)()>(result.get().getAddress());
+            compiled_function();
+        }else{
+            throw error::make<error::LLVMError>(result.takeError());
+        }
         ++counter;
         return 0;
     }
