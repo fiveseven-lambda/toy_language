@@ -1,3 +1,6 @@
+#ifndef EXPRESSION_HPP
+#define EXPRESSION_HPP
+
 #include <memory>
 #include <utility>
 #include <string>
@@ -70,3 +73,4 @@ namespace expression {
     };
 }
 
+#endif
