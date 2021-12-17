@@ -1,22 +1,27 @@
 #include "pos.hpp"
 #include "error.hpp"
-#include "token.hpp"
-#include "lexer.hpp"
-#include "sentence.hpp"
-#include "parser.hpp"
-#include "environment.hpp"
+
+#include <cassert>
+#include <sstream>
+
+static void test_pos(){
+    pos::Pos pos(20, 30);
+    auto [line, byte] = pos.into_inner();
+    assert(line == 20);
+    assert(byte == 30);
+    std::stringstream ss;
+    ss << pos;
+    assert(ss.str() == "21:31");
+}
+
+static void test_range(){
+    pos::Range range(2, 3, 5);
+    std::stringstream ss;
+    ss << range;
+    assert(ss.str() == "3:4-3:5");
+}
 
 int main(){
-    Lexer lexer;
-    environment::Environment environment;
-    try{
-        while(true){
-            std::unique_ptr<sentence::Sentence> sentence = parse_sentence(lexer);
-            if(!sentence) break;
-            // sentence->debug_print();
-            environment.run(sentence);
-        }
-    }catch(std::unique_ptr<error::Error> &error){
-        error->eprint(lexer.get_log());
-    }
+    test_pos();
+    test_range();
 }
