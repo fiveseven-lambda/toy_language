@@ -5,6 +5,8 @@
 #include <string>
 #include <memory>
 
+#include "pos.hpp"
+
 namespace error {
     class Error {
     public:
@@ -16,6 +18,20 @@ namespace error {
     std::unique_ptr<Error> make(Args&&... args){
         return std::make_unique<Err>(std::forward<Args>(args)...);
     }
+
+    class UnexpectedCharacter : public Error {
+        pos::Pos pos;
+    public:
+        UnexpectedCharacter(pos::Pos);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    class UnterminatedComment : public Error {
+        std::vector<pos::Pos> poss;
+    public:
+        UnterminatedComment(std::vector<pos::Pos>);
+        void eprint(const std::vector<std::string> &) const override;
+    };
 }
 
 #endif
