@@ -7,20 +7,25 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <vector>
 
-#include "pos.hpp"
 #include "token.hpp"
 
-class Lexer {
-    class Inner {
-        std::vector<pos::Pos> comment;
-    public:
-        void run(std::size_t, const std::string &, std::queue<std::unique_ptr<token::Token>> &);
-        void deal_with_eof();
-    } inner;
+class Inner {
+    std::vector<pos::Pos> comment;
+public:
+    void run(
+        std::size_t,
+        const std::string &,
+        std::queue<std::unique_ptr<token::Token>> &
+    );
+    void deal_with_eof();
+};
 
+class Lexer {
     std::istream &source;
     bool prompt;
+    Inner inner;
     std::vector<std::string> log;
     std::queue<std::unique_ptr<token::Token>> tokens;
 public:

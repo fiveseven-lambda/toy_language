@@ -25,7 +25,6 @@ namespace pos {
         Range(std::size_t, std::size_t, std::size_t);
         friend std::ostream &operator<<(std::ostream &, const Range &);
         void eprint(const std::vector<std::string> &) const;
-        Range &operator+=(const Range &);
     };
 }
 

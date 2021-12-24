@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "pos.hpp"
-#include "llvm/Support/Error.h"
 
 namespace error {
     class Error {
@@ -31,56 +30,6 @@ namespace error {
         std::vector<pos::Pos> poss;
     public:
         UnterminatedComment(std::vector<pos::Pos>);
-        void eprint(const std::vector<std::string> &) const override;
-    };
-
-    class InvalidIntegerLiteral : public Error {
-        std::exception &error;
-        pos::Range pos;
-    public:
-        InvalidIntegerLiteral(std::exception &, pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
-    };
-
-    class NoExpressionAfterOperator : public Error {
-        pos::Range pos;
-    public:
-        NoExpressionAfterOperator(pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
-    };
-
-    class NoClosingParenthesis : public Error {
-        pos::Range pos;
-    public:
-        NoClosingParenthesis(pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
-    };
-
-    class UnexpectedTokenInParenthesis : public Error {
-        pos::Range pos, open;
-    public:
-        UnexpectedTokenInParenthesis(pos::Range, pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
-    };
-
-    class EmptyParenthesis : public Error {
-        pos::Range pos;
-    public:
-        EmptyParenthesis(pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
-    };
-
-    class EmptyArgument: public Error {
-        pos::Range pos;
-    public:
-        EmptyArgument(pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
-    };
-
-    class LLVMError: public Error {
-        llvm::Error error;
-    public:
-        LLVMError(llvm::Error);
         void eprint(const std::vector<std::string> &) const override;
     };
 }

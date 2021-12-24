@@ -4,176 +4,153 @@
 #include <memory>
 #include <utility>
 #include <string>
-#include <optional>
 
 #include "pos.hpp"
-#include "expression.hpp"
-#include "type.hpp"
 
 namespace token {
     class Token {
     public:
         pos::Range pos;
         virtual ~Token();
-        virtual std::optional<std::string> identifier();
-        virtual std::shared_ptr<type::Type> type_name();
-        virtual std::optional<std::int32_t> positive_integer(), negative_integer();
-        virtual std::optional<expression::UnaryOperator> prefix();
-        virtual std::optional<expression::BinaryOperator> binary_operator();
-        virtual bool
-            is_equal(),
-            is_opening_parenthesis(),
-            is_closing_parenthesis(),
-            is_opening_brace(),
-            is_closing_brace(),
-            is_opening_bracket(),
-            is_closing_bracket(),
-            is_dot(),
-            is_comma(),
-            is_semicolon(),
-            is_colon();
+        virtual void debug_print() const = 0;
     };
 
     class Identifier : public Token {
         std::string name;
     public:
         Identifier(std::string);
-        std::optional<std::string> identifier() override;
-        std::shared_ptr<type::Type> type_name() override;
+        void debug_print() const override;
     };
 
     class Integer : public Token {
         std::string value;
     public:
         Integer(std::string);
-        std::optional<std::int32_t> positive_integer() override, negative_integer() override;
+        void debug_print() const override;
     };
 
     class Plus : public Token {
-        std::optional<expression::UnaryOperator> prefix() override;
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class PlusEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Hyphen : public Token {
-        std::optional<expression::UnaryOperator> prefix() override;
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class HyphenEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Asterisk : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class AsteriskEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Slash : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class SlashEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Percent : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class PercentEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Ampersand : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class AmpersandEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class DoubleAmpersand : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Bar : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class BarEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class DoubleBar : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Circumflex : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class CircumflexEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Tilde : public Token {
-        std::optional<expression::UnaryOperator> prefix() override;
+        void debug_print() const override;
     };
     class Equal : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
-        bool is_equal() override;
+        void debug_print() const override;
     };
     class DoubleEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Exclamation : public Token {
-        std::optional<expression::UnaryOperator> prefix() override;
+        void debug_print() const override;
     };
     class ExclamationEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Less : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class LessEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class DoubleLess : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class DoubleLessEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class Greater : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class GreaterEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class DoubleGreater : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class DoubleGreaterEqual : public Token {
-        std::optional<expression::BinaryOperator> binary_operator() override;
+        void debug_print() const override;
     };
     class OpeningParenthesis : public Token {
-        bool is_opening_parenthesis() override;
+        void debug_print() const override;
     };
     class ClosingParenthesis : public Token {
-        bool is_closing_parenthesis() override;
+        void debug_print() const override;
     };
     class OpeningBrace : public Token {
-        bool is_opening_brace() override;
+        void debug_print() const override;
     };
     class ClosingBrace : public Token {
-        bool is_closing_brace() override;
+        void debug_print() const override;
     };
     class OpeningBracket : public Token {
-        bool is_opening_bracket() override;
+        void debug_print() const override;
     };
     class ClosingBracket : public Token {
-        bool is_closing_bracket() override;
+        void debug_print() const override;
     };
     class Dot : public Token {
-        bool is_dot() override;
+        void debug_print() const override;
     };
     class Colon : public Token {
-        bool is_colon() override;
+        void debug_print() const override;
     };
     class Semicolon : public Token {
-        bool is_semicolon() override;
+        void debug_print() const override;
     };
     class Comma : public Token {
-        bool is_comma() override;
+        void debug_print() const override;
     };
 }
 
