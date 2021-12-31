@@ -1,9 +1,52 @@
 #include "token.hpp"
 
+#include <boost/safe_numerics/safe_integer.hpp>
+
+#include "error.hpp"
+
 namespace token {
     Token::~Token() = default;
     Identifier::Identifier(std::string name): name(std::move(name)) {}
     Integer::Integer(std::string value): value(std::move(value)) {}
+
+    std::optional<std::string> Token::identifier(){ return std::nullopt; }
+    std::optional<std::string> Identifier::identifier(){ return std::move(name); }
+
+    std::optional<std::int32_t> Token::positive_integer(){ return std::nullopt; }
+    std::optional<std::int32_t> Integer::positive_integer(){
+        using safe_i32 = boost::safe_numerics::safe<std::int32_t>;
+        safe_i32 ret(0);
+        constexpr safe_i32 base(10);
+        try{
+            for(char c : value) ret = ret * base + safe_i32(c - '0');
+        }catch(std::exception &e){
+            throw error::make<error::InvalidIntegerLiteral>(e, std::move(pos));
+        }
+        return ret;
+    }
+    std::optional<std::int32_t> Token::negative_integer(){ return std::nullopt; }
+    std::optional<std::int32_t> Integer::negative_integer(){
+        using safe_i32 = boost::safe_numerics::safe<std::int32_t>;
+        safe_i32 ret(0);
+        constexpr safe_i32 base(10);
+        try{
+            for(char c : value) ret = ret * base - safe_i32(c - '0');
+        }catch(std::exception &e){
+            throw error::make<error::InvalidIntegerLiteral>(e, std::move(pos));
+        }
+        return ret;
+    }
+
+    std::optional<expression::UnaryOperator> Token::prefix(){ return std::nullopt; }
+    std::optional<expression::UnaryOperator> Plus::prefix(){ return expression::UnaryOperator::Plus; }
+    std::optional<expression::UnaryOperator> Hyphen::prefix(){ return expression::UnaryOperator::Minus; }
+    std::optional<expression::UnaryOperator> Tilde::prefix(){ return expression::UnaryOperator::BitNot; }
+    std::optional<expression::UnaryOperator> Exclamation::prefix(){ return expression::UnaryOperator::LogicalNot; }
+
+    bool Token::is_opening_parenthesis() const { return false; }
+    bool OpeningParenthesis::is_opening_parenthesis() const { return true; }
+    bool Token::is_closing_parenthesis() const { return false; }
+    bool ClosingParenthesis::is_closing_parenthesis() const { return true; }
 }
 
 #define define_debug_print(token) \

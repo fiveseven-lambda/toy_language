@@ -1,15 +1,22 @@
 #include "pos.hpp"
 
 namespace pos {
-    Pos::Pos() = default;
+    Pos::Pos(): line(0), byte(0) {}
     Pos::Pos(std::size_t line, std::size_t byte): line(line), byte(byte) {}
     Range::Range() = default;
     Range::Range(std::size_t line, std::size_t start, std::size_t end):
         start(line, start),
         end(line, end) {}
+    Range::Range(Range &&) = default;
+    Range &Range::operator=(Range &&) = default;
 
     std::pair<std::size_t, std::size_t> Pos::into_inner() const {
         return {line, byte};
+    }
+
+    Range &Range::operator+=(const Range &other){
+        end = other.end;
+        return *this;
     }
 
     std::ostream &operator<<(std::ostream &os, const Pos &pos){
