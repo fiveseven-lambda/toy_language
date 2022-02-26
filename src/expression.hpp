@@ -8,7 +8,14 @@
 
 #include "pos.hpp"
 
+/**
+ * @file expression.hpp
+ * @brief 式
+ */
+
+//! 式
 namespace expression {
+    //! 全ての式の基底クラス
     class Expression {
     public:
         pos::Range pos;
@@ -16,6 +23,7 @@ namespace expression {
         virtual void debug_print(int = 0) const = 0;
     };
 
+    //! 単一の識別子からなる式
     class Identifier : public Expression {
         std::string name;
     public:
@@ -23,6 +31,7 @@ namespace expression {
         void debug_print(int) const override;
     };
 
+    //! 単一の整数リテラルからなる式
     class Integer : public Expression {
         std::int32_t value;
     public:
@@ -30,10 +39,12 @@ namespace expression {
         void debug_print(int) const override;
     };
 
+    //! 単項演算子
     enum class UnaryOperator {
         Plus, Minus,
         LogicalNot, BitNot
     };
+
     class Unary : public Expression {
         UnaryOperator unary_operator;
         std::unique_ptr<Expression> operand;
@@ -42,6 +53,7 @@ namespace expression {
         void debug_print(int) const override;
     };
 
+    //! 2 項演算子
     enum class BinaryOperator {
         Mul, Div, Rem,
         Add, Sub,
@@ -56,6 +68,7 @@ namespace expression {
         BitAndAssign, BitOrAssign, BitXorAssign,
         RightShiftAssign, LeftShiftAssign
     };
+
     class Binary : public Expression {
         BinaryOperator binary_operator;
         std::unique_ptr<Expression> left, right;

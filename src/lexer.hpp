@@ -11,21 +11,25 @@
 
 #include "token.hpp"
 
-class Inner {
-    std::vector<pos::Pos> comment;
-public:
-    void run(
-        std::size_t,
-        const std::string &,
-        std::queue<std::unique_ptr<token::Token>> &
-    );
-    void deal_with_eof();
-};
+/**
+ * @file lexer.hpp
+ * @brief 字句解析
+ */
 
+//! 入力を読みながら字句解析を行い，トークン列を返す．
 class Lexer {
     std::istream &source;
     bool prompt;
-    Inner inner;
+    class Inner {
+        std::vector<pos::Pos> comment;
+    public:
+        void run(
+            std::size_t,
+            const std::string &,
+            std::queue<std::unique_ptr<token::Token>> &
+        );
+        void deal_with_eof();
+    } inner;
     std::vector<std::string> log;
     std::queue<std::unique_ptr<token::Token>> tokens;
 public:
