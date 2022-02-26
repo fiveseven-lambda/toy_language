@@ -15,6 +15,11 @@
 
 #include "token.hpp"
 
+/**
+ * @brief 字句解析を行うクラス
+ *
+ * 入力を読み取って，字句解析を行う．
+ */
 class Lexer {
     std::istream &source;
     bool prompt;

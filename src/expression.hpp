@@ -12,14 +12,23 @@
 
 #include "pos.hpp"
 
+//! 式を定義する
 namespace expression {
+    /**
+     * @brief 全ての式の基底クラス．
+     */
     class Expression {
     public:
+        //! ソースコード中の位置．
         pos::Range pos;
         virtual ~Expression();
+        //! デバッグ出力用の関数．いずれ消す．
         virtual void debug_print(int = 0) const = 0;
     };
 
+    /**
+     * @brief 単一の識別子からなる式．
+     */
     class Identifier : public Expression {
         std::string name;
     public:
@@ -27,6 +36,9 @@ namespace expression {
         void debug_print(int) const override;
     };
 
+    /**
+     * @brief 単一の整数リテラルからなる式．
+     */
     class Integer : public Expression {
         std::int32_t value;
     public:
@@ -34,18 +46,34 @@ namespace expression {
         void debug_print(int) const override;
     };
 
+    /**
+     * @brief 単項演算子
+     */
     enum class UnaryOperator {
-        Plus, Minus,
-        LogicalNot, BitNot
+        //! 何もしない
+        Plus,
+        //! 符号の反転
+        Minus,
+        //! 論理否定
+        LogicalNot,
+        //! ビット毎の否定
+        BitNot
     };
-    class Unary : public Expression {
+
+    /**
+     * @brief 単項演算
+     */
+    class UnaryOperation : public Expression {
         UnaryOperator unary_operator;
         std::unique_ptr<Expression> operand;
     public:
-        Unary(UnaryOperator, std::unique_ptr<Expression>);
+        UnaryOperation(UnaryOperator, std::unique_ptr<Expression>);
         void debug_print(int) const override;
     };
 
+    /**
+     * @brief 2 項演算子
+     */
     enum class BinaryOperator {
         Mul, Div, Rem,
         Add, Sub,
@@ -60,14 +88,21 @@ namespace expression {
         BitAndAssign, BitOrAssign, BitXorAssign,
         RightShiftAssign, LeftShiftAssign
     };
-    class Binary : public Expression {
+
+    /**
+     * @brief 2項演算
+     */
+    class BinaryOperation : public Expression {
         BinaryOperator binary_operator;
         std::unique_ptr<Expression> left, right;
     public:
-        Binary(BinaryOperator, std::unique_ptr<Expression>, std::unique_ptr<Expression>);
+        BinaryOperation(BinaryOperator, std::unique_ptr<Expression>, std::unique_ptr<Expression>);
         void debug_print(int) const override;
     };
 
+    /**
+     * @brief 関数呼び出し
+     */
     class Invocation : public Expression {
         std::unique_ptr<Expression> function;
         std::vector<std::unique_ptr<Expression>> arguments;

@@ -5,15 +5,19 @@
 
 namespace expression {
     Expression::~Expression() = default;
+    //! コンストラクタ
     Identifier::Identifier(std::string name): name(std::move(name)) {}
+    //! コンストラクタ
     Integer::Integer(std::int32_t value): value(value) {}
-    Unary::Unary(
+    //! コンストラクタ
+    UnaryOperation::UnaryOperation(
         UnaryOperator unary_operator,
         std::unique_ptr<Expression> operand
     ):
         unary_operator(unary_operator),
         operand(std::move(operand)) {}
-    Binary::Binary(
+    //! コンストラクタ
+    BinaryOperation::BinaryOperation(
         BinaryOperator binary_operator,
         std::unique_ptr<Expression> left,
         std::unique_ptr<Expression> right
@@ -21,6 +25,13 @@ namespace expression {
         binary_operator(binary_operator),
         left(std::move(left)),
         right(std::move(right)) {}
+    //! コンストラクタ
+    Invocation::Invocation(
+        std::unique_ptr<Expression> function,
+        std::vector<std::unique_ptr<Expression>> arguments
+    ):
+        function(std::move(function)),
+        arguments(std::move(arguments)) {}
 
     static constexpr std::string_view INDENT = "    ";
     void Identifier::debug_print(int depth) const {
@@ -31,7 +42,7 @@ namespace expression {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
         std::cout << pos << ": Integer(" << value << ")" << std::endl;
     }
-    void Unary::debug_print(int depth) const {
+    void UnaryOperation::debug_print(int depth) const {
         std::string_view name;
         switch(unary_operator){
             case UnaryOperator::Plus: name = "plus"; break;
@@ -40,10 +51,10 @@ namespace expression {
             case UnaryOperator::BitNot: name = "bitwise not";
         }
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
-        std::cout << pos << ": Unary(" << name << ")" << std::endl;
+        std::cout << pos << ": UnaryOperation(" << name << ")" << std::endl;
         operand->debug_print(depth + 1);
     }
-    void Binary::debug_print(int depth) const {
+    void BinaryOperation::debug_print(int depth) const {
         std::string_view name;
         switch(binary_operator){
             case BinaryOperator::Mul: name = "mul"; break;
@@ -78,7 +89,7 @@ namespace expression {
         }
         left->debug_print(depth + 1);
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
-        std::cout << pos << ": Binary(" << name << ")" << std::endl;
+        std::cout << pos << ": BinaryOperation(" << name << ")" << std::endl;
         right->debug_print(depth + 1);
     }
     void Invocation::debug_print(int depth) const {

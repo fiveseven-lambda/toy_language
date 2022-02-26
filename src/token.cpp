@@ -6,7 +6,9 @@
 
 namespace token {
     Token::~Token() = default;
+    //! @brief コンストラクタ
     Identifier::Identifier(std::string name): name(std::move(name)) {}
+    //! @brief コンストラクタ
     Integer::Integer(std::string value): value(std::move(value)) {}
 
     std::optional<std::string> Token::identifier(){ return std::nullopt; }

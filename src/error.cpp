@@ -2,13 +2,21 @@
 
 namespace error {
     Error::~Error() = default;
+    //! コンストラクタ
     UnexpectedCharacter::UnexpectedCharacter(pos::Pos pos): pos(std::move(pos)) {}
+    //! コンストラクタ
     UnterminatedComment::UnterminatedComment(std::vector<pos::Pos> poss): poss(std::move(poss)) {}
+    //! コンストラクタ
     InvalidIntegerLiteral::InvalidIntegerLiteral(std::exception &error, pos::Range pos): error(error), pos(std::move(pos)) {}
+    //! コンストラクタ
     NoClosingParenthesis::NoClosingParenthesis(pos::Range pos): pos(std::move(pos)) {}
+    //! コンストラクタ
     UnexpectedTokenInParenthesis::UnexpectedTokenInParenthesis(pos::Range pos, pos::Range open): pos(std::move(pos)), open(std::move(open)) {}
+    //! コンストラクタ
     EmptyParenthesis::EmptyParenthesis(pos::Range pos): pos(std::move(pos)) {}
+    //! コンストラクタ
     UnexpectedTokenAtFactor::UnexpectedTokenAtFactor(pos::Range pos): pos(std::move(pos)) {}
+    //! コンストラクタ
     UnexpectedEOFAfterPrefix::UnexpectedEOFAfterPrefix(pos::Range pos) : pos(std::move(pos)) {}
 
     void UnexpectedCharacter::eprint(const std::vector<std::string> &log) const {

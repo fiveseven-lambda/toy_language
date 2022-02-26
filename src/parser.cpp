@@ -27,7 +27,7 @@ static std::unique_ptr<expression::Expression> parse_factor(Lexer &lexer){
         }else{
             auto operand = parse_factor(lexer);
             pos += operand->pos;
-            ret = std::make_unique<expression::Unary>(prefix.value(), std::move(operand));
+            ret = std::make_unique<expression::UnaryOperation>(prefix.value(), std::move(operand));
         }
     }else if(token_ref->is_opening_parenthesis()){
         pos = std::move(lexer.next()->pos);

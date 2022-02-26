@@ -1,11 +1,27 @@
 #include "lexer.hpp"
 #include "error.hpp"
 
+/**
+ * @brief 標準入力から読む．
+ */
 Lexer::Lexer(): source(std::cin), prompt(true) {}
+/**
+ * @brief 指定された `std::ifstream` から読む．
+ */
 Lexer::Lexer(std::ifstream &source): source(source), prompt(false) {}
 
+/**
+ * @brief 今までに読んだ入力の記録を返す．
+ */
 const std::vector<std::string> &Lexer::get_log() const { return log; }
 
+/**
+ * @brief 次のトークンへの参照を返すが，読み進めない．
+ *
+ * 必要なら入力を待つ．
+ *
+ * @retval nullptr EOF に達するまでトークンを読み終えた．
+ */
 std::unique_ptr<token::Token> &Lexer::peek(){
     while(tokens.empty()){
         if(source){
@@ -22,6 +38,13 @@ std::unique_ptr<token::Token> &Lexer::peek(){
     return tokens.front();
 }
 
+/**
+ * @brief 次のトークンを返し，読み進める．
+ *
+ * 必要なら入力を待つ．
+ *
+ * @retval nullptr EOF に達するまでトークンを読み終えた．
+ */
 std::unique_ptr<token::Token> Lexer::next(){
     auto ret = std::move(peek());
     tokens.pop();
