@@ -1,3 +1,7 @@
+/**
+ * @file token.hpp
+ * @brief トークンを定義する
+ */
 #ifndef TOKEN_HPP
 #define TOKEN_HPP
 

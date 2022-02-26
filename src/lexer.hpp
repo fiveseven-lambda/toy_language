@@ -1,3 +1,7 @@
+/**
+ * @file lexer.hpp
+ * @brief 字句解析を行う
+ */
 #ifndef LEXER_HPP
 #define LEXER_HPP
 

@@ -1,3 +1,7 @@
+/**
+ * @file parser.hpp
+ * @brief 構文解析を行う
+ */
 #ifndef PARSER_HPP
 #define PARSER_HPP
 

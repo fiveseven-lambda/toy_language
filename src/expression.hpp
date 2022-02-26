@@ -1,3 +1,7 @@
+/**
+ * @file expression.hpp
+ * @brief 式を定義する
+ */
 #ifndef EXPRESSION_HPP
 #define EXPRESSION_HPP
 
