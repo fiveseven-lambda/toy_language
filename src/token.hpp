@@ -25,24 +25,14 @@ namespace token {
         virtual ~Token();
         //! デバッグ用の関数．いずれ消す．
         virtual void debug_print() const = 0;
-        //! 識別子ならば中身を `std::string` で返し，そうでなければ `std::nullopt` を返す．
         virtual std::optional<std::string> identifier();
-        //! 整数リテラルなら正の数として `std::int32_t` で読み取って返し，そうでなければ `std::nullopt` を返す．
         virtual std::optional<std::int32_t> positive_integer();
-        //! 整数リテラルなら負の数として `std::int32_t` で読み取って返し，そうでなければ `std::nullopt` を返す．
         virtual std::optional<std::int32_t> negative_integer();
-        //! 前置単項演算子なら対応する `expression::UnaryOperator` を返し，そうでなければ `std::nullopt` を返す．
         virtual std::optional<expression::UnaryOperator> prefix();
-        /**
-         * @retval true 開き括弧 `(`
-         * @retval false それ以外
-         */
-        virtual bool is_opening_parenthesis() const;
-        /**
-         * @retval true 閉じ括弧 `)`
-         * @retval false それ以外
-         */
-        virtual bool is_closing_parenthesis() const;
+        virtual std::optional<expression::BinaryOperator> infix();
+        virtual bool
+            is_opening_parenthesis() const,
+            is_closing_parenthesis() const;
     };
 
     /**
@@ -71,75 +61,93 @@ namespace token {
     class Plus : public Token {
         void debug_print() const override;
         std::optional<expression::UnaryOperator> prefix() override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 加算代入 `+=`
     class PlusEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 減算 `-`
     class Hyphen : public Token {
         void debug_print() const override;
         std::optional<expression::UnaryOperator> prefix() override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 減算代入 `-=`
     class HyphenEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 乗算 `*`
     class Asterisk : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 乗算代入 `*=`
     class AsteriskEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 除算 `/`
     class Slash : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 除算代入 `/=`
     class SlashEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 剰余 `%`
     class Percent : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 剰余代入 `%=`
     class PercentEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `&`
     class Ampersand : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `&=`
     class AmpersandEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `&&`
     class DoubleAmpersand : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `|`
     class Bar : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `|=`
     class BarEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `||`
     class DoubleBar : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `^`
     class Circumflex : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `^=`
     class CircumflexEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `~`
     class Tilde : public Token {
@@ -149,10 +157,12 @@ namespace token {
     //! `=`
     class Equal : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `==`
     class DoubleEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `!`
     class Exclamation : public Token {
@@ -162,38 +172,47 @@ namespace token {
     //! `!=`
     class ExclamationEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `<`
     class Less : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `<=`
     class LessEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `<<`
     class DoubleLess : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `<<=`
     class DoubleLessEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `>`
     class Greater : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `>=`
     class GreaterEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `>>`
     class DoubleGreater : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! `>>=`
     class DoubleGreaterEqual : public Token {
         void debug_print() const override;
+        std::optional<expression::BinaryOperator> infix() override;
     };
     //! 開き丸括弧 `(`
     class OpeningParenthesis : public Token {

@@ -18,6 +18,11 @@ namespace error {
     UnexpectedTokenAtFactor::UnexpectedTokenAtFactor(pos::Range pos): pos(std::move(pos)) {}
     //! コンストラクタ
     UnexpectedEOFAfterPrefix::UnexpectedEOFAfterPrefix(pos::Range pos) : pos(std::move(pos)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos 2 項演算子のあった場所
+     */
+    NoExpressionAfterOperator::NoExpressionAfterOperator(pos::Range pos): pos(std::move(pos)) {}
 
     void UnexpectedCharacter::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected character at " << pos << std::endl;
@@ -54,6 +59,10 @@ namespace error {
     }
     void UnexpectedEOFAfterPrefix::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected end of file after the prefix at " << pos << std::endl;
+        pos.eprint(log);
+    }
+    void NoExpressionAfterOperator::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "an expression expected after an operator at " << pos << std::endl;
         pos.eprint(log);
     }
 }

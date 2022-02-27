@@ -21,6 +21,8 @@ const std::vector<std::string> &Lexer::get_log() const { return log; }
  * 必要なら入力を待つ．
  *
  * @retval nullptr EOF に達するまでトークンを読み終えた．
+ * @throw error::UnexpectedCharacter 空白でもトークンの先頭でもない文字が現れた．
+ * @throw error::UnterminatedComment コメントが終了しないまま EOF に達した．
  */
 std::unique_ptr<token::Token> &Lexer::peek(){
     while(tokens.empty()){
@@ -44,6 +46,8 @@ std::unique_ptr<token::Token> &Lexer::peek(){
  * 必要なら入力を待つ．
  *
  * @retval nullptr EOF に達するまでトークンを読み終えた．
+ * @throw error::UnexpectedCharacter 空白でもトークンの先頭でもない文字が現れた．
+ * @throw error::UnterminatedComment コメントが終了しないまま EOF に達した．
  */
 std::unique_ptr<token::Token> Lexer::next(){
     auto ret = std::move(peek());

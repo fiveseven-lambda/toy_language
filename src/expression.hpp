@@ -75,18 +75,64 @@ namespace expression {
      * @brief 2 項演算子
      */
     enum class BinaryOperator {
-        Mul, Div, Rem,
-        Add, Sub,
-        LeftShift, RightShift,
-        BitAnd, BitOr, BitXor,
-        Equal, NotEqual,
-        Less, Greater,
-        LessEqual, GreaterEqual,
-        LogicalAnd, LogicalOr,
+        //! 加算
+        Add,
+        //! 減算
+        Sub,
+        //! 乗算
+        Mul,
+        //! 除算
+        Div,
+        //! 剰余演算
+        Rem,
+        //! 左シフト
+        LeftShift,
+        //! 右シフト
+        RightShift,
+        //! 等しい
+        Equal,
+        //! 等しくない
+        NotEqual,
+        //! 左が大きい
+        Less,
+        //! 右が大きい
+        Greater,
+        //! 等しいか左が大きい
+        LessEqual,
+        //! 等しいか右が大きい
+        GreaterEqual,
+        //! 論理積
+        LogicalAnd,
+        //! 論理和
+        LogicalOr,
+        //! ビット毎論理積
+        BitAnd,
+        //! ビット毎論理和
+        BitOr,
+        //! ビット毎排他的論理和
+        BitXor,
+        //! 代入
         Assign,
-        MulAssign, DivAssign, RemAssign, AddAssign, SubAssign,
-        BitAndAssign, BitOrAssign, BitXorAssign,
-        RightShiftAssign, LeftShiftAssign
+        //! 加算代入
+        AddAssign,
+        //! 減算代入
+        SubAssign,
+        //! 乗算代入
+        MulAssign,
+        //! 除算代入
+        DivAssign,
+        //! 剰余代入
+        RemAssign,
+        //! ビット毎論理積代入
+        BitAndAssign,
+        //! ビット毎論理和代入
+        BitOrAssign,
+        //! ビット毎排他的論理和代入
+        BitXorAssign,
+        //! 右シフト代入
+        RightShiftAssign,
+        //! 左シフト代入
+        LeftShiftAssign
     };
 
     /**

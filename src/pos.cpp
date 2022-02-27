@@ -25,6 +25,14 @@ namespace pos {
     /**
      * @brief コンストラクタ
      *
+     * @param start 開始（自身含む）
+     * @param end 終了（自身含まない）
+     */
+    Range::Range(Pos start, Pos end): start(start), end(end) {}
+
+    /**
+     * @brief コンストラクタ
+     *
      * 複数行にまたがらない場合（開始と終了が同じ行にある場合）に使う．
      * @param line 何行目か（0-indexed で）
      * @param start 何バイト目からか（0-indexed で，`start` 自身も含む）
@@ -43,6 +51,13 @@ namespace pos {
      * @brief ムーブ代入演算子
      */
     Range &Range::operator=(Range &&) = default;
+
+    /**
+     * @brief クローン
+     */
+    Range Range::clone(){
+        return Range(start, end);
+    }
 
     /**
      * @brief Pos から `line`，`byte` の値を取り出す．

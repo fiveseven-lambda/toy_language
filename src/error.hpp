@@ -37,7 +37,7 @@ namespace error {
         return std::make_unique<Err>(std::forward<Args>(args)...);
     }
 
-    //! ソースコード中に予期せぬ文字が現れた．
+    //! 字句解析中に予期せぬ文字が現れた．
     class UnexpectedCharacter : public Error {
         // 予期せぬ文字の現れた場所
         pos::Pos pos;
@@ -55,7 +55,7 @@ namespace error {
         void eprint(const std::vector<std::string> &) const override;
     };
 
-    //! 整数リテラルが 32 ビット整数値におさまらなかった．
+    //! 整数リテラルの値が符号付き 32 ビット整数型におさまらなかった．
     class InvalidIntegerLiteral : public Error {
         // boost の safe_numerics が投げた例外
         std::exception &error;
@@ -105,6 +105,14 @@ namespace error {
         pos::Range pos;
     public:
         UnexpectedEOFAfterPrefix(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! 2 項演算子の後に式が来なかった
+    class NoExpressionAfterOperator : public Error {
+        pos::Range pos;
+    public:
+        NoExpressionAfterOperator(pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
 }

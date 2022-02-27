@@ -11,9 +11,18 @@ namespace token {
     //! @brief コンストラクタ
     Integer::Integer(std::string value): value(std::move(value)) {}
 
+    /**
+     * @brief 識別子を `std::string` に変換する．
+     * @retval std::nullopt 識別子ではない．
+     */
     std::optional<std::string> Token::identifier(){ return std::nullopt; }
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
 
+    /**
+     * @brief 整数リテラルを整数値に変換する．
+     * @retval std::nullopt 整数リテラルではない．
+     * @throw error::InvalidIntegerLiteral 32 ビットにおさまらなかった．
+     */
     std::optional<std::int32_t> Token::positive_integer(){ return std::nullopt; }
     std::optional<std::int32_t> Integer::positive_integer(){
         using safe_i32 = boost::safe_numerics::safe<std::int32_t>;
@@ -26,6 +35,12 @@ namespace token {
         }
         return ret;
     }
+
+    /**
+     * @brief 整数リテラルに負号を付けて整数値に変換する．
+     * @retval std::nullopt 整数リテラルではない．
+     * @throw error::InvalidIntegerLiteral 32 ビットにおさまらなかった．
+     */
     std::optional<std::int32_t> Token::negative_integer(){ return std::nullopt; }
     std::optional<std::int32_t> Integer::negative_integer(){
         using safe_i32 = boost::safe_numerics::safe<std::int32_t>;
@@ -39,14 +54,62 @@ namespace token {
         return ret;
     }
 
+    /**
+     * @brief 前置単項演算子を `expression::UnaryOperator` に変換する．
+     * @retval std::nullopt 前置単項演算子ではない．
+     */
     std::optional<expression::UnaryOperator> Token::prefix(){ return std::nullopt; }
     std::optional<expression::UnaryOperator> Plus::prefix(){ return expression::UnaryOperator::Plus; }
     std::optional<expression::UnaryOperator> Hyphen::prefix(){ return expression::UnaryOperator::Minus; }
     std::optional<expression::UnaryOperator> Tilde::prefix(){ return expression::UnaryOperator::BitNot; }
     std::optional<expression::UnaryOperator> Exclamation::prefix(){ return expression::UnaryOperator::LogicalNot; }
 
+    /**
+     * @brief 中置 2 項演算子を `expression::BinaryOperator` に変換する．
+     * @retval std::nullopt 中置 2 項演算子ではない．
+     */
+    std::optional<expression::BinaryOperator> Token::infix(){ return std::nullopt; }
+    std::optional<expression::BinaryOperator> Plus::infix(){ return expression::BinaryOperator::Add; }
+    std::optional<expression::BinaryOperator> PlusEqual::infix(){ return expression::BinaryOperator::AddAssign; }
+    std::optional<expression::BinaryOperator> Hyphen::infix(){ return expression::BinaryOperator::Sub; }
+    std::optional<expression::BinaryOperator> HyphenEqual::infix(){ return expression::BinaryOperator::SubAssign; }
+    std::optional<expression::BinaryOperator> Asterisk::infix(){ return expression::BinaryOperator::Mul; }
+    std::optional<expression::BinaryOperator> AsteriskEqual::infix(){ return expression::BinaryOperator::MulAssign; }
+    std::optional<expression::BinaryOperator> Slash::infix(){ return expression::BinaryOperator::Div; }
+    std::optional<expression::BinaryOperator> SlashEqual::infix(){ return expression::BinaryOperator::DivAssign; }
+    std::optional<expression::BinaryOperator> Percent::infix(){ return expression::BinaryOperator::Rem; }
+    std::optional<expression::BinaryOperator> PercentEqual::infix(){ return expression::BinaryOperator::RemAssign; }
+    std::optional<expression::BinaryOperator> Ampersand::infix(){ return expression::BinaryOperator::BitAnd; }
+    std::optional<expression::BinaryOperator> AmpersandEqual::infix(){ return expression::BinaryOperator::BitAndAssign; }
+    std::optional<expression::BinaryOperator> DoubleAmpersand::infix(){ return expression::BinaryOperator::LogicalAnd; }
+    std::optional<expression::BinaryOperator> Bar::infix(){ return expression::BinaryOperator::BitOr; }
+    std::optional<expression::BinaryOperator> BarEqual::infix(){ return expression::BinaryOperator::BitOrAssign; }
+    std::optional<expression::BinaryOperator> DoubleBar::infix(){ return expression::BinaryOperator::LogicalOr; }
+    std::optional<expression::BinaryOperator> Circumflex::infix(){ return expression::BinaryOperator::BitXor; }
+    std::optional<expression::BinaryOperator> CircumflexEqual::infix(){ return expression::BinaryOperator::BitXorAssign; }
+    std::optional<expression::BinaryOperator> Equal::infix(){ return expression::BinaryOperator::Assign; }
+    std::optional<expression::BinaryOperator> DoubleEqual::infix(){ return expression::BinaryOperator::Equal; }
+    std::optional<expression::BinaryOperator> ExclamationEqual::infix(){ return expression::BinaryOperator::NotEqual; }
+    std::optional<expression::BinaryOperator> Less::infix(){ return expression::BinaryOperator::Less; }
+    std::optional<expression::BinaryOperator> LessEqual::infix(){ return expression::BinaryOperator::LessEqual; }
+    std::optional<expression::BinaryOperator> DoubleLess::infix(){ return expression::BinaryOperator::LeftShift; }
+    std::optional<expression::BinaryOperator> DoubleLessEqual::infix(){ return expression::BinaryOperator::LeftShiftAssign; }
+    std::optional<expression::BinaryOperator> Greater::infix(){ return expression::BinaryOperator::Greater; }
+    std::optional<expression::BinaryOperator> GreaterEqual::infix(){ return expression::BinaryOperator::GreaterEqual; }
+    std::optional<expression::BinaryOperator> DoubleGreater::infix(){ return expression::BinaryOperator::RightShift; }
+    std::optional<expression::BinaryOperator> DoubleGreaterEqual::infix(){ return expression::BinaryOperator::RightShiftAssign; }
+
+    /**
+     * @retval true 開き括弧 `(`
+     * @retval false それ以外
+     */
     bool Token::is_opening_parenthesis() const { return false; }
     bool OpeningParenthesis::is_opening_parenthesis() const { return true; }
+
+    /**
+     * @retval true 閉じ括弧 `)`
+     * @retval false それ以外
+     */
     bool Token::is_closing_parenthesis() const { return false; }
     bool ClosingParenthesis::is_closing_parenthesis() const { return true; }
 }

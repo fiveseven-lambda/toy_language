@@ -33,11 +33,13 @@ namespace pos {
     public:
         Range();
         Range(std::size_t, std::size_t, std::size_t);
+        Range(Pos, Pos);
         Range(const Range &) = delete;
         Range &operator=(const Range &) = delete;
         Range(Range &&);
         Range &operator=(Range &&);
         Range &operator+=(const Range &);
+        Range clone();
         friend std::ostream &operator<<(std::ostream &, const Range &);
         void eprint(const std::vector<std::string> &) const;
     };
