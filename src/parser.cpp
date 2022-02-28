@@ -2,6 +2,19 @@
 
 #include "error.hpp"
 
+static std::unique_ptr<expression::Expression> parse_expression(Lexer &);
+
+static std::unique_ptr<type::Type> parse_type(Lexer &lexer){
+    auto &token_ref = lexer.peek();
+    if(!token_ref) return nullptr;
+    if(auto type = token_ref->primitive_type()){
+        type->pos = std::move(lexer.next()->pos);
+        return type;
+    }else{
+        return nullptr;
+    }
+}
+
 static std::vector<std::unique_ptr<expression::Expression>> parse_list(Lexer &);
 
 static std::unique_ptr<expression::Expression> parse_factor(Lexer &lexer){
@@ -172,4 +185,70 @@ static std::vector<std::unique_ptr<expression::Expression>> parse_list(Lexer &le
             return ret;
         }
     }
+}
+
+/**
+ * @brief 入力をパースして文を返す．
+ */
+std::unique_ptr<sentence::Sentence> parse_sentence(Lexer &lexer){
+    auto expression = parse_expression(lexer);
+    auto &token_ref = lexer.peek();
+    if(!token_ref){
+        if(expression){
+            // 式の終わりにセミコロンがないまま EOF
+            // 本当はエラー
+            return nullptr;
+        }else{
+            // 正常に EOF に達した
+            return nullptr;
+        }
+    }
+    if(token_ref->is_semicolon()){
+        pos::Range pos;
+        if(expression){
+            pos = expression->pos.clone();
+            pos += lexer.next()->pos;
+        }else{
+            pos = std::move(lexer.next()->pos);
+        }
+        auto ret = std::make_unique<sentence::Expression>(std::move(expression));
+        ret->pos = std::move(pos);
+        return ret;
+    }else if(token_ref->is_colon()){
+        if(auto identifier = expression->identifier()){
+            auto pos = std::move(expression->pos);
+            lexer.next(); // コロン自体
+            auto type = parse_type(lexer);
+
+            auto equal_or_semicolon = lexer.next();
+            pos::Range end_pos;
+
+            std::unique_ptr<expression::Expression> right_side;
+            if(equal_or_semicolon->is_semicolon()){
+                right_side = nullptr;
+                end_pos = std::move(equal_or_semicolon->pos);
+            }else if(equal_or_semicolon->is_equal()){
+                right_side = parse_expression(lexer);
+                auto semicolon = lexer.next();
+                if(!semicolon->is_semicolon()){
+                    // エラー
+                    return nullptr;
+                }
+                end_pos = std::move(semicolon->pos);
+            }else{
+                // エラー
+                return nullptr;
+            }
+
+            pos += end_pos;
+            auto ret = std::make_unique<sentence::Declaration>(std::move(identifier.value()), std::move(type), std::move(right_side));
+            ret->pos = std::move(pos);
+            return ret;
+        }else{
+            // コロンの前が識別子ではない
+            // 本当はエラー
+            return nullptr;
+        }
+    }
+    return nullptr;
 }

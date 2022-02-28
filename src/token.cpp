@@ -19,6 +19,21 @@ namespace token {
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
 
     /**
+     * @brief プリミティブ型の名前を `type::Type` に変換する．
+     * @retval nullptr プリミティブ型の名前ではない．
+     */
+    std::unique_ptr<type::Type> Token::primitive_type(){ return nullptr; }
+    std::unique_ptr<type::Type> Identifier::primitive_type(){
+        if(name == "integer"){
+            return std::make_unique<type::Integer>();
+        }else if(name == "boolean"){
+            return std::make_unique<type::Boolean>();
+        }else{
+            return nullptr;
+        }
+    }
+
+    /**
      * @brief 整数リテラルを整数値に変換する．
      * @retval std::nullopt 整数リテラルではない．
      * @throw error::InvalidIntegerLiteral 32 ビットにおさまらなかった．
@@ -100,18 +115,74 @@ namespace token {
     std::optional<expression::BinaryOperator> DoubleGreaterEqual::infix(){ return expression::BinaryOperator::RightShiftAssign; }
 
     /**
-     * @retval true 開き括弧 `(`
+     * @retval true イコール `=`
+     * @retval false それ以外
+     */
+    bool Token::is_equal() const { return false; }
+    bool Equal::is_equal() const { return true; }
+
+    /**
+     * @retval true 開き丸括弧 `(`
      * @retval false それ以外
      */
     bool Token::is_opening_parenthesis() const { return false; }
     bool OpeningParenthesis::is_opening_parenthesis() const { return true; }
 
     /**
-     * @retval true 閉じ括弧 `)`
+     * @retval true 閉じ丸括弧 `)`
      * @retval false それ以外
      */
     bool Token::is_closing_parenthesis() const { return false; }
     bool ClosingParenthesis::is_closing_parenthesis() const { return true; }
+
+    /**
+     * @retval true 開き波括弧 `{`
+     * @retval false それ以外
+     */
+    bool Token::is_opening_brace() const { return false; }
+    bool OpeningBrace::is_opening_brace() const { return true; }
+
+    /**
+     * @retval true 閉じ波括弧 `}`
+     * @retval false それ以外
+     */
+    bool Token::is_closing_brace() const { return false; }
+    bool ClosingBrace::is_closing_brace() const { return true; }
+
+    /**
+     * @retval true 開き四角括弧 `[`
+     * @retval false それ以外
+     */
+    bool Token::is_opening_bracket() const { return false; }
+    bool OpeningBracket::is_opening_bracket() const { return true; }
+
+    /**
+     * @retval true 閉じ四角括弧 `]`
+     * @retval false それ以外
+     */
+    bool Token::is_closing_bracket() const { return false; }
+    bool ClosingBracket::is_closing_bracket() const { return true; }
+
+    /**
+     * @retval true ドット `.`
+     * @retval false それ以外
+     */
+    bool Token::is_dot() const { return false; }
+    bool Dot::is_dot() const { return true; }
+
+    /**
+     * @retval true コロン `:`
+     * @retval false それ以外
+     */
+    bool Token::is_colon() const { return false; }
+    bool Colon::is_colon() const { return true; }
+
+    /**
+     * @retval true セミコロン `;`
+     * @retval false それ以外
+     */
+    bool Token::is_semicolon() const { return false; }
+    bool Semicolon::is_semicolon() const { return true; }
 
     /**
      * @retval true コンマ `,`
@@ -119,59 +190,4 @@ namespace token {
      */
     bool Token::is_comma() const { return false; }
     bool Comma::is_comma() const { return true; }
-}
-
-#define define_debug_print(token) \
-void token::debug_print() const { \
-    std::cout << #token << std::endl; \
-}
-
-namespace token {
-    void Identifier::debug_print() const {
-        std::cout << "Identifier(" << name << ")" << std::endl;
-    }
-    void Integer::debug_print() const {
-        std::cout << "Integer(" << value << ")" << std::endl;
-    }
-    define_debug_print(Plus)
-    define_debug_print(PlusEqual)
-    define_debug_print(Hyphen)
-    define_debug_print(HyphenEqual)
-    define_debug_print(Asterisk)
-    define_debug_print(AsteriskEqual)
-    define_debug_print(Slash)
-    define_debug_print(SlashEqual)
-    define_debug_print(Percent)
-    define_debug_print(PercentEqual)
-    define_debug_print(Ampersand)
-    define_debug_print(AmpersandEqual)
-    define_debug_print(DoubleAmpersand)
-    define_debug_print(Bar)
-    define_debug_print(BarEqual)
-    define_debug_print(DoubleBar)
-    define_debug_print(Circumflex)
-    define_debug_print(CircumflexEqual)
-    define_debug_print(Tilde)
-    define_debug_print(Equal)
-    define_debug_print(DoubleEqual)
-    define_debug_print(Exclamation)
-    define_debug_print(ExclamationEqual)
-    define_debug_print(Less)
-    define_debug_print(LessEqual)
-    define_debug_print(DoubleLess)
-    define_debug_print(DoubleLessEqual)
-    define_debug_print(Greater)
-    define_debug_print(GreaterEqual)
-    define_debug_print(DoubleGreater)
-    define_debug_print(DoubleGreaterEqual)
-    define_debug_print(OpeningParenthesis)
-    define_debug_print(ClosingParenthesis)
-    define_debug_print(OpeningBrace)
-    define_debug_print(ClosingBrace)
-    define_debug_print(OpeningBracket)
-    define_debug_print(ClosingBracket)
-    define_debug_print(Dot)
-    define_debug_print(Colon)
-    define_debug_print(Semicolon)
-    define_debug_print(Comma)
 }

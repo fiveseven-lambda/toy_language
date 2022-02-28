@@ -36,6 +36,9 @@ namespace expression {
         function(std::move(function)),
         arguments(std::move(arguments)) {}
 
+    std::optional<std::string> Expression::identifier() { return std::nullopt; }
+    std::optional<std::string> Identifier::identifier() { return std::move(name); }
+
     static constexpr std::string_view INDENT = "    ";
     void Identifier::debug_print(int depth) const {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;

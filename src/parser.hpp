@@ -8,9 +8,9 @@
 #include <memory>
 
 #include "lexer.hpp"
-#include "expression.hpp"
 
-//! 式．いずれ `parser.cpp` 中の `static` な関数になる．
-std::unique_ptr<expression::Expression> parse_expression(Lexer &);
+#include "sentence.hpp"
+
+std::unique_ptr<sentence::Sentence> parse_sentence(Lexer &);
 
 #endif

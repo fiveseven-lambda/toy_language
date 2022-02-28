@@ -9,6 +9,7 @@
 #include <utility>
 #include <string>
 #include <cstddef>
+#include <optional>
 
 #include "pos.hpp"
 
@@ -73,6 +74,7 @@ namespace expression {
         //! ソースコード中の位置．
         pos::Range pos;
         virtual ~Expression();
+        virtual std::optional<std::string> identifier();
         //! デバッグ出力用の関数．いずれ消す．
         virtual void debug_print(int = 0) const = 0;
     };
@@ -84,6 +86,7 @@ namespace expression {
         std::string name;
     public:
         Identifier(std::string);
+        std::optional<std::string> identifier() override;
         void debug_print(int) const override;
     };
 
