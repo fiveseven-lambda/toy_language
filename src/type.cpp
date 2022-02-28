@@ -1,3 +1,6 @@
+/**
+ * @file type.cpp
+ */
 #include "type.hpp"
 
 namespace type {

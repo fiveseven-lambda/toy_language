@@ -1,3 +1,6 @@
+/**
+ * @file parser.cpp
+ */
 #include "parser.hpp"
 
 #include "error.hpp"
@@ -76,17 +79,29 @@ static std::unique_ptr<expression::Expression> parse_factor(Lexer &lexer){
     }
 }
 
+//! 2 項演算子の優先順位
 enum Precedence{
+    //! 代入演算子 `=` と複合代入演算子
     AssignPrecedence,
+    //! `||`
     LogicalOrPrecedence,
+    //! `&&`
     LogicalAndPrecedence,
+    //! 比較演算子 `==` `!=` `<` `<=` `>` `>=`
     ComparisonPrecedence,
+    //! `|`
     BitOrPrecedence,
+    //! `^`
     BitXorPrecedence,
+    //! `&`
     BitAndPrecedence,
+    //! `<<` `>>`
     ShiftPrecedence,
+    //! `+` `-`
     AddSubPrecedence,
+    //! `*` `/` `%`
     MulDivRemPrecedence,
+    //! 番兵
     MaxPrecedence
 };
 static Precedence precedence(expression::BinaryOperator binary_operator){
@@ -133,8 +148,11 @@ static Precedence precedence(expression::BinaryOperator binary_operator){
     }
 }
 
+//! 2 項演算子の結合の向き
 enum class Associativity{
+    //! 左結合
     LeftToRight,
+    //! 右結合
     RightToLeft
 };
 static Associativity associativity(int precedence){

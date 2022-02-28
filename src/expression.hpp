@@ -6,9 +6,6 @@
 #define EXPRESSION_HPP
 
 #include <memory>
-#include <utility>
-#include <string>
-#include <cstddef>
 #include <optional>
 
 #include "pos.hpp"

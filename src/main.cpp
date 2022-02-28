@@ -1,11 +1,9 @@
-#include <iostream>
-#include <memory>
+/**
+ * @file main.cpp
+ */
 
-#include "pos.hpp"
-#include "error.hpp"
-#include "token.hpp"
-#include "lexer.hpp"
 #include "parser.hpp"
+#include "error.hpp"
 
 int main(){
     Lexer lexer;

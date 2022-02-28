@@ -1,3 +1,6 @@
+/**
+ * @file token.cpp
+ */
 #include "token.hpp"
 
 #include <boost/safe_numerics/safe_integer.hpp>

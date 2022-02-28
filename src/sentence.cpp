@@ -1,9 +1,19 @@
+/**
+ * @file sentence.cpp
+ */
 #include "sentence.hpp"
 
 namespace sentence {
     Sentence::~Sentence() = default;
+    //! コンストラクタ
     Expression::Expression(std::unique_ptr<expression::Expression> expression):
         expression(std::move(expression)) {}
+    /**
+     * @brief コンストラクタ
+     * @param name 宣言された変数名
+     * @param type 型
+     * @param expression 初期化の式
+     */
     Declaration::Declaration(
         std::string name,
         std::unique_ptr<type::Type> type,

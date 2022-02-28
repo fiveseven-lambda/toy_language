@@ -5,7 +5,6 @@
 #ifndef SENTENCE_HPP
 #define SENTENCE_HPP
 
-#include "pos.hpp"
 #include "type.hpp"
 #include "expression.hpp"
 

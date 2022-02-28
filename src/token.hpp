@@ -5,12 +5,6 @@
 #ifndef TOKEN_HPP
 #define TOKEN_HPP
 
-#include <memory>
-#include <utility>
-#include <string>
-#include <optional>
-
-#include "pos.hpp"
 #include "expression.hpp"
 #include "type.hpp"
 

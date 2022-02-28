@@ -1,6 +1,8 @@
+/**
+ * @file expression.cpp
+ */
 #include "expression.hpp"
 
-#include <iostream>
 #include <string_view>
 
 namespace expression {
@@ -36,6 +38,10 @@ namespace expression {
         function(std::move(function)),
         arguments(std::move(arguments)) {}
 
+    /**
+     * @brief 単一の識別子からなる式なら，識別子名を返す．
+     * @retval std::nullopt 単一の識別子からなる式ではない
+     */
     std::optional<std::string> Expression::identifier() { return std::nullopt; }
     std::optional<std::string> Identifier::identifier() { return std::move(name); }
 

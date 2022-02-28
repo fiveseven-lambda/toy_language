@@ -1,3 +1,6 @@
+/**
+ * @file error.cpp
+ */
 #include "error.hpp"
 
 namespace error {

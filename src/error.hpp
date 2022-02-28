@@ -6,8 +6,6 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-#include <vector>
-#include <string>
 #include <memory>
 
 #include "pos.hpp"

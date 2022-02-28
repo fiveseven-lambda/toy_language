@@ -1,3 +1,6 @@
+/**
+ * @file lexer.cpp
+ */
 #include "lexer.hpp"
 #include "error.hpp"
 
