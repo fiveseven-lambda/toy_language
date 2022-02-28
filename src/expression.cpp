@@ -26,6 +26,9 @@ namespace expression {
         left(std::move(left)),
         right(std::move(right)) {}
     //! コンストラクタ
+    Group::Group(std::unique_ptr<Expression> expression):
+        expression(std::move(expression)) {}
+    //! コンストラクタ
     Invocation::Invocation(
         std::unique_ptr<Expression> function,
         std::vector<std::unique_ptr<Expression>> arguments
@@ -91,6 +94,11 @@ namespace expression {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;
         std::cout << pos << ": BinaryOperation(" << name << ")" << std::endl;
         right->debug_print(depth + 1);
+    }
+    void Group::debug_print(int depth) const {
+        for(int i = 0; i < depth; ++i) std::cout << INDENT;
+        std::cout << pos << ": Group" << std::endl;
+	expression->debug_print(depth + 1);
     }
     void Invocation::debug_print(int depth) const {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;

@@ -32,11 +32,12 @@ namespace token {
         virtual std::optional<expression::BinaryOperator> infix();
         virtual bool
             is_opening_parenthesis() const,
-            is_closing_parenthesis() const;
+            is_closing_parenthesis() const,
+            is_comma() const;
     };
 
     /**
-     * @brief 識別子
+     * @brief 識別子 `[a-zA-Z_][a-zA-Z0-9_]*`
      */
     class Identifier : public Token {
         std::string name;
@@ -47,7 +48,7 @@ namespace token {
     };
 
     /**
-     * @brief 整数リテラル．
+     * @brief 整数リテラル `[0-9]+`
      */
     class Integer : public Token {
         std::string value;
@@ -255,6 +256,7 @@ namespace token {
     //! コンマ `,`
     class Comma : public Token {
         void debug_print() const override;
+        bool is_comma() const override;
     };
 }
 

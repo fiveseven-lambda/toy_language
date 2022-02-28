@@ -115,6 +115,14 @@ namespace error {
         NoExpressionAfterOperator(pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
+
+    //! 関数呼び出しにおいて，引数を区切る `,` の前に要素が無かった
+    class EmptyArgument: public Error {
+        pos::Range pos;
+    public:
+        EmptyArgument(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
 }
 
 #endif

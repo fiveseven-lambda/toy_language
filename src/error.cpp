@@ -23,6 +23,11 @@ namespace error {
      * @param pos 2 項演算子のあった場所
      */
     NoExpressionAfterOperator::NoExpressionAfterOperator(pos::Range pos): pos(std::move(pos)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos カンマのあった場所
+     */
+    EmptyArgument::EmptyArgument(pos::Range pos): pos(std::move(pos)) {}
 
     void UnexpectedCharacter::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected character at " << pos << std::endl;
@@ -63,6 +68,10 @@ namespace error {
     }
     void NoExpressionAfterOperator::eprint(const std::vector<std::string> &log) const {
         std::cerr << "an expression expected after an operator at " << pos << std::endl;
+        pos.eprint(log);
+    }
+    void EmptyArgument::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "empty argument in a function call at " << pos << std::endl;
         pos.eprint(log);
     }
 }

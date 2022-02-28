@@ -16,9 +16,13 @@ Lexer::Lexer(std::ifstream &source): source(source), prompt(false) {}
 const std::vector<std::string> &Lexer::get_log() const { return log; }
 
 /**
- * @brief 次のトークンへの参照を返すが，読み進めない．
+ * @brief 次のトークンへの参照を返すが，読み進めない．必要なら入力を待つ．
  *
- * 必要なら入力を待つ．
+ * プライベートメンバであるキュー `tokens` の中身が残っていれば，
+ * 入力を読まずにその先頭の要素への参照を返す．
+ * `tokens` が空になっていたら，
+ * 入力を 1 行読んで `Inner::run()` を呼び出す．
+ * `Inner::run()` は行をトークンに分解し，`tokens` に格納する．
  *
  * @retval nullptr EOF に達するまでトークンを読み終えた．
  * @throw error::UnexpectedCharacter 空白でもトークンの先頭でもない文字が現れた．
@@ -27,23 +31,32 @@ const std::vector<std::string> &Lexer::get_log() const { return log; }
 std::unique_ptr<token::Token> &Lexer::peek(){
     while(tokens.empty()){
         if(source){
+            // まだ EOF に達していない
+            // 次の行が何行目か
             auto line_num = log.size();
+            // log に空の std::string を追加し，1 行読んで格納
             log.emplace_back();
             if(prompt) std::cout << "> ";
             std::getline(source, log.back());
+            // 字句解析を行う
             inner.run(line_num, log.back(), tokens);
         }else{
+            // EOF に達した
+            // コメント中なら例外を投げる
             inner.deal_with_eof();
+            // トークンの代わりに nullptr を入れる
             tokens.emplace();
         }
     }
+    // ここで tokens は空でない
     return tokens.front();
 }
 
 /**
- * @brief 次のトークンを返し，読み進める．
+ * @brief 次のトークンを返し，読み進める．必要なら入力を待つ．
  *
- * 必要なら入力を待つ．
+ * プライベートメンバであるキュー `tokens` の中身が残っていれば，
+ * 入力を読まずに先頭の要素を `pop` して返す．
  *
  * @retval nullptr EOF に達するまでトークンを読み終えた．
  * @throw error::UnexpectedCharacter 空白でもトークンの先頭でもない文字が現れた．

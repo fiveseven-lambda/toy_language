@@ -12,7 +12,58 @@
 
 #include "pos.hpp"
 
-//! 式を定義する
+/**
+ * @brief 式を定義する
+ *
+ * @code
+ * <Invocation> ::= <Identifier>
+ *                | <Integer>
+ *                | `(` <Expression> `)`
+ *                | <Invocation> `(` <List> `)`
+ * <Factor> ::= <Invocation>
+ *            | <UnaryOperator> <Factor>
+ * <Term> ::= <Factor>
+ *          | <Term> `*` <Factor>
+ *          | <Term> `/` <Factor>
+ *          | <Term> `%` <Factor>
+ * <AddSub> ::= <Term>
+ *            | <AddSub> `+` <Term>
+ *            | <AddSub> `-` <Term>
+ * <Shift> ::= <AddSub>
+ *           | <Shift> `<<` <AddSub>
+ *           | <Shift> `>>` <AddSub>
+ * <BitAnd> ::= <Shift>
+ *            | <BitAnd> `&` <Shift>
+ * <BitXor> ::= <BitAnd>
+ *            | <BitXor> `^` <BitAnd>
+ * <BitOr> ::= <BitXor>
+ *           | <BitOr> `|` <BitXor>
+ * <Comparison> ::= <BitOr>
+ *                | <Comparison> `==` <BitOr>
+ *                | <Comparison> `!=` <BitOr>
+ *                | <Comparison> `<` <BitOr>
+ *                | <Comparison> `<=` <BitOr>
+ *                | <Comparison> `>` <BitOr>
+ *                | <Comparison> `>=` <BitOr>
+ * <LogicalAnd> ::= <Comparison>
+ *                | <LogicalAnd> `&&` <Comparison>
+ * <LogicalOr> ::= <LogicalAnd>
+ *               | <LogicalOr> `||` <LogicalAnd>
+ * <Expression> ::= <LogicalOr>
+ *                | <LogicalOr> `=` <Expression>
+ *                | <LogicalOr> `+=` <Expression>
+ *                | <LogicalOr> `-=` <Expression>
+ *                | <LogicalOr> `*=` <Expression>
+ *                | <LogicalOr> `/=` <Expression>
+ *                | <LogicalOr> `%=` <Expression>
+ *                | <LogicalOr> `<<=` <Expression>
+ *                | <LogicalOr> `>>=` <Expression>
+ *                | <LogicalOr> `&=` <Expression>
+ *                | <LogicalOr> `|=` <Expression>
+ *                | <LogicalOr> `^=` <Expression>
+ * <List> ::= ( <Expression> `,` )* <Expression>?
+ * @endcode
+ */
 namespace expression {
     /**
      * @brief 全ての式の基底クラス．
@@ -143,6 +194,16 @@ namespace expression {
         std::unique_ptr<Expression> left, right;
     public:
         BinaryOperation(BinaryOperator, std::unique_ptr<Expression>, std::unique_ptr<Expression>);
+        void debug_print(int) const override;
+    };
+
+    /**
+     * @brief 括弧でくくられた式
+     */
+    class Group : public Expression {
+        std::unique_ptr<Expression> expression;
+    public:
+	Group(std::unique_ptr<Expression>);
         void debug_print(int) const override;
     };
 

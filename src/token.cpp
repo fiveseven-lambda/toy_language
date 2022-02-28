@@ -112,6 +112,13 @@ namespace token {
      */
     bool Token::is_closing_parenthesis() const { return false; }
     bool ClosingParenthesis::is_closing_parenthesis() const { return true; }
+
+    /**
+     * @retval true コンマ `,`
+     * @retval false それ以外
+     */
+    bool Token::is_comma() const { return false; }
+    bool Comma::is_comma() const { return true; }
 }
 
 #define define_debug_print(token) \
