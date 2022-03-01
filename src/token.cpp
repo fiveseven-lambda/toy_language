@@ -4,6 +4,7 @@
 #include "token.hpp"
 
 #include <boost/safe_numerics/safe_integer.hpp>
+#include <unordered_map>
 
 #include "error.hpp"
 
@@ -15,11 +16,26 @@ namespace token {
     Integer::Integer(std::string value): value(std::move(value)) {}
 
     /**
+     * @brief キーワードを `token::Keyword` に変換する．
+     * @retval std::nullopt キーワードではない．
+     */
+    std::optional<Keyword> Token::keyword(){ return std::nullopt; }
+    std::optional<Keyword> Identifier::keyword(){
+        if(name == "if") return Keyword::If;
+        if(name == "else") return Keyword::Else;
+        if(name == "while") return Keyword::While;
+        return std::nullopt;
+    }
+
+    /**
      * @brief 識別子を `std::string` に変換する．
      * @retval std::nullopt 識別子ではない．
      */
     std::optional<std::string> Token::identifier(){ return std::nullopt; }
-    std::optional<std::string> Identifier::identifier(){ return std::move(name); }
+    std::optional<std::string> Identifier::identifier(){
+        if(keyword()) return std::nullopt;
+        return std::move(name);
+    }
 
     /**
      * @brief プリミティブ型の名前を `type::Type` に変換する．

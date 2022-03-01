@@ -11,8 +11,11 @@
 /**
  * @brief 文を定義する．
  * @code
- * <Sentence> ::= <Expression> `;`
+ * <Sentence> ::= <Expression>? `;`
  *              | <Identifier> `:` <Type>? ( `=` <Expression> )? `;`
+ *              | `{` <Sentence>* `}`
+ *              | `if` `(` <Expression> `)` <Sentence> ( `else` <Sentence> )?
+ *              | `while` `(` <Expression> `)` <Sentence>
  * @endcode
  */
 namespace sentence {
@@ -48,6 +51,38 @@ namespace sentence {
         void debug_print(int) const override;
     public:
         Declaration(std::string, std::unique_ptr<type::Type>, std::unique_ptr<expression::Expression>);
+    };
+
+    /**
+     * @brief ブロック
+     */
+    class Block : public Sentence {
+        std::vector<std::unique_ptr<Sentence>> sentences;
+        void debug_print(int) const override;
+    public:
+        Block(std::vector<std::unique_ptr<Sentence>>);
+    };
+
+    /**
+     * @brief if 文
+     */
+    class If : public Sentence {
+        std::unique_ptr<expression::Expression> condition;
+        std::unique_ptr<Sentence> if_clause, else_clause;
+        void debug_print(int) const override;
+    public:
+        If(std::unique_ptr<expression::Expression>, std::unique_ptr<Sentence>, std::unique_ptr<Sentence>);
+    };
+
+    /**
+     * @brief while 文
+     */
+    class While : public Sentence {
+        std::unique_ptr<expression::Expression> condition;
+        std::unique_ptr<Sentence> sentence;
+        void debug_print(int) const override;
+    public:
+        While(std::unique_ptr<expression::Expression>, std::unique_ptr<Sentence>);
     };
 }
 

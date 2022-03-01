@@ -48,7 +48,10 @@ namespace error {
     EmptyParenthesis::EmptyParenthesis(pos::Range open, pos::Range close):
         open(std::move(open)),
         close(std::move(close)) {}
-    //! コンストラクタ
+    /**
+     * @brief コンストラクタ
+     * @param pos 2 項演算子のあった場所
+     */
     UnexpectedEOFAfterPrefix::UnexpectedEOFAfterPrefix(pos::Range pos) : pos(std::move(pos)) {}
     /**
      * @brief コンストラクタ
@@ -60,6 +63,57 @@ namespace error {
      * @param pos カンマのあった場所
      */
     EmptyArgument::EmptyArgument(pos::Range pos): pos(std::move(pos)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos 式があればその位置
+     * @param colon コロンの位置
+     */
+    NoIdentifierBeforeColon::NoIdentifierBeforeColon(std::optional<pos::Range> pos, pos::Range colon):
+        pos(std::move(pos)), colon(std::move(colon)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos トークンがあればその位置（EOF なら `std::nullopt`）
+     * @param declaration 宣言の位置
+     */
+    NoSemicolonAfterDeclaration::NoSemicolonAfterDeclaration(std::optional<pos::Range> pos, pos::Range declaration):
+        pos(std::move(pos)), declaration(std::move(declaration)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos トークンがあればその位置（EOF なら `std::nullopt`）
+     * @param expression 式の位置
+     */
+    NoSemicolonAfterExpression::NoSemicolonAfterExpression(std::optional<pos::Range> pos, pos::Range expression):
+        pos(std::move(pos)), expression(std::move(expression)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos トークンの位置
+     */
+    UnexpectedTokenAtSentence::UnexpectedTokenAtSentence(pos::Range pos): pos(std::move(pos)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos 開き括弧の位置
+     */
+    NoClosingBrace::NoClosingBrace(pos::Range pos): pos(std::move(pos)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos トークンがあればその位置（EOF なら `std::nullopt`）
+     * @param keyword キーワードの位置
+     */
+    NoParenthesisAfterKeyword::NoParenthesisAfterKeyword(std::optional<pos::Range> pos, pos::Range keyword):
+        pos(std::move(pos)), keyword(std::move(keyword)) {}
+    /**
+     * @brief コンストラクタ
+     * @param open 開き括弧の位置
+     * @param close 閉じ括弧の位置
+     */
+    EmptyCondition::EmptyCondition(pos::Range open, pos::Range close):
+        open(std::move(open)),
+        close(std::move(close)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos 制御文の位置
+     */
+    UnexpectedEOFInControlStatement::UnexpectedEOFInControlStatement(pos::Range pos): pos(std::move(pos)) {}
 
     void UnexpectedCharacter::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected character at " << pos << std::endl;
@@ -108,6 +162,59 @@ namespace error {
     }
     void EmptyArgument::eprint(const std::vector<std::string> &log) const {
         std::cerr << "empty argument in a function call at " << pos << std::endl;
+        pos.eprint(log);
+    }
+    void NoIdentifierBeforeColon::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "no identifier";
+        if(pos) std::cerr << " at " << pos.value();
+        std::cerr << " before colon" << std::endl;
+        if(pos) pos.value().eprint(log);
+        std::cerr << "note: colon at " << colon << std::endl;
+        colon.eprint(log);
+    }
+    void NoSemicolonAfterDeclaration::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "no semicolon";
+        if(pos) std::cerr << " at " << pos.value();
+        std::cerr << " after declaration" << std::endl;
+        if(pos) pos.value().eprint(log);
+        std::cerr << "note: declaration at " << declaration << std::endl;
+        declaration.eprint(log);
+    }
+    void NoSemicolonAfterExpression::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "no semicolon";
+        if(pos) std::cerr << " at " << pos.value();
+        std::cerr << " after expression" << std::endl;
+        if(pos) pos.value().eprint(log);
+        std::cerr << "note: expression at " << expression << std::endl;
+        expression.eprint(log);
+    }
+    void UnexpectedTokenAtSentence::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "unexpected token at " << pos << " (expected sentence)" << std::endl;
+        pos.eprint(log);
+    }
+    void NoClosingBrace::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "no closing brace (opened at " << pos << ")" << std::endl;
+        pos.eprint(log);
+    }
+    void NoParenthesisAfterKeyword::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "opening parenthesis expected";
+        if(pos){
+            std::cerr << " at " << pos.value() << std::endl;
+            pos.value().eprint(log);
+        }else{
+            std::cerr << std::endl;
+        }
+        std::cerr << "note: keyword at " << keyword << std::endl;
+        keyword.eprint(log);
+    }
+    void EmptyCondition::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "empty parenthesis (opened at " << open << ")" << std::endl;
+        open.eprint(log);
+        std::cerr << "closed at " << close << ")" << std::endl;
+        close.eprint(log);
+    }
+    void UnexpectedEOFInControlStatement::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "unexpected EOF in control statement at " << pos << std::endl;
         pos.eprint(log);
     }
 }

@@ -10,6 +10,16 @@
 
 //! トークンを定義する．
 namespace token {
+    //! キーワード
+    enum class Keyword {
+        //! `if` 条件分岐
+        If,
+        //! `else` 条件分岐
+        Else,
+        //! `while` ループ
+        While
+    };
+
     /**
      * @brief 全てのトークンの基底クラス
      */
@@ -19,6 +29,7 @@ namespace token {
         pos::Range pos;
         virtual ~Token();
         virtual std::optional<std::string> identifier();
+        virtual std::optional<Keyword> keyword();
         virtual std::unique_ptr<type::Type> primitive_type();
         virtual std::optional<std::int32_t> positive_integer();
         virtual std::optional<std::int32_t> negative_integer();
@@ -44,6 +55,7 @@ namespace token {
     class Identifier : public Token {
         std::string name;
         std::optional<std::string> identifier() override;
+        std::optional<Keyword> keyword() override;
         std::unique_ptr<type::Type> primitive_type() override;
     public:
         Identifier(std::string);

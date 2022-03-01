@@ -7,6 +7,7 @@
 #define ERROR_HPP
 
 #include <memory>
+#include <optional>
 
 #include "pos.hpp"
 
@@ -70,7 +71,6 @@ namespace error {
 
     //! 開き括弧に対応する閉じ括弧が来ることなく EOF
     class NoClosingParenthesis : public Error {
-        // 開いた場所
         pos::Range pos;
     public:
         NoClosingParenthesis(pos::Range);
@@ -95,7 +95,6 @@ namespace error {
 
     //! prefix の直後に予期せぬ EOF
     class UnexpectedEOFAfterPrefix : public Error {
-        // prefix の場所
         pos::Range pos;
     public:
         UnexpectedEOFAfterPrefix(pos::Range);
@@ -119,10 +118,78 @@ namespace error {
     };
 
     //! 関数呼び出しにおいて，引数を区切る `,` の前に要素が無かった
-    class EmptyArgument: public Error {
+    class EmptyArgument : public Error {
         pos::Range pos;
     public:
         EmptyArgument(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! コロンの前が識別子ではない
+    class NoIdentifierBeforeColon : public Error {
+        std::optional<pos::Range> pos;
+        pos::Range colon;
+    public:
+        NoIdentifierBeforeColon(std::optional<pos::Range>, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! 宣言の後にセミコロンがない
+    class NoSemicolonAfterDeclaration : public Error {
+        std::optional<pos::Range> pos;
+        pos::Range declaration;
+    public:
+        NoSemicolonAfterDeclaration(std::optional<pos::Range>, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! 式の後にセミコロンがない
+    class NoSemicolonAfterExpression : public Error {
+        std::optional<pos::Range> pos;
+        pos::Range expression;
+    public:
+        NoSemicolonAfterExpression(std::optional<pos::Range>, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! 文の始まりで予期せぬトークン
+    class UnexpectedTokenAtSentence : public Error {
+        pos::Range pos;
+    public:
+        UnexpectedTokenAtSentence(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! 開き括弧に対応する閉じ括弧が来ることなく EOF
+    class NoClosingBrace : public Error {
+        pos::Range pos;
+    public:
+        NoClosingBrace(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! `if` `while` の後に `(` が来ない
+    class NoParenthesisAfterKeyword : public Error {
+        std::optional<pos::Range> pos;
+        pos::Range keyword;
+    public:
+        NoParenthesisAfterKeyword(std::optional<pos::Range>, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! `if` `while` の後の `()` が空
+    class EmptyCondition : public Error {
+        pos::Range open, close;
+    public:
+        EmptyCondition(pos::Range, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! `if` `while` の後の `()` の後，`else` の後に文が無く，EOF
+    class UnexpectedEOFInControlStatement : public Error {
+        pos::Range pos;
+    public:
+        UnexpectedEOFInControlStatement(pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
 }

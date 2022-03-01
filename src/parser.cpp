@@ -271,67 +271,129 @@ static std::vector<std::unique_ptr<expression::Expression>> parse_list(Lexer &le
 }
 
 /**
- * @brief 入力をパースして文を返す．
+ * @brief `<Sentence>` をパースする．
+ * @code
+ * <Sentence> ::= <Expression>? `;`
+ *              | <Identifier> `:` <Type>? ( `=` <Expression> )? `;`
+ *              | `{` <Sentence>* `}`
+ *              | `if` `(` <Expression> `)` <Sentence> ( `else` <Sentence> )?
+ *              | `while` `(` <Expression> `)` <Sentence>
+ * @endcode
+ * @retval nullptr EOF に達した．
+ * @throw error::NoIdentifierBeforeColon 宣言において `:` の前に `<Identifier>` 以外の `<Expression>` か ε があった
+ * @throw error::NoSemicolonAfterDeclaration 宣言において `;` の代わりに EOF か別のトークンがあった
+ * @throw error::NoExpressionAfterOperator 宣言において `=` の後に式が来なかった（`parse_expression()` が ε を返した）
+ * @throw error::NoSemicolonAfterExpression ``<Sentence> ::= <Expression>? `;` `` において `<Expression>` はあったが `;` の代わりに EOF か別のトークンがあった
+ * @throw error::NoClosingBrace `{` で開始したブロックが終わることなく EOF に達した
+ * @throw error::NoParenthesisAfterKeyword `if`，`while` の後に開き丸括弧 `(` が来なかった（EOF か予期せぬトークン）
+ * @throw error::NoClosingParenthesis `if`，`while` の条件節が終わることなく EOF に達した
+ * @throw error::UnexpectedTokenInParenthesis `if`，`while` の条件節中に予期せぬトークンが現れた
+ * @throw error::EmptyCondition `if`，`while` の条件節が空の `()` だった
+ * @throw error::UnexpectedEOFInControlStatement `if()`，`while()`，`else` の後に文が無く，EOF に達した
+ * @throw error::UnexpectedTokenAtSentence 先頭のトークンが `<Sentence>` を生成するいずれでもなかった
  */
 std::unique_ptr<sentence::Sentence> parse_sentence(Lexer &lexer){
     auto expression = parse_expression(lexer);
-    auto &token_ref = lexer.peek();
-    if(!token_ref){
-        if(expression){
-            // 式の終わりにセミコロンがないまま EOF
-            // 本当はエラー
-            return nullptr;
-        }else{
-            // 正常に EOF に達した
-            return nullptr;
-        }
-    }
-    if(token_ref->is_semicolon()){
-        pos::Range pos;
-        if(expression){
-            pos = expression->pos.clone();
-            pos += lexer.next()->pos;
-        }else{
-            pos = std::move(lexer.next()->pos);
-        }
+    auto token = lexer.next();
+    if(token && token->is_semicolon()){
+        auto pos = expression ? expression->pos + token->pos : std::move(token->pos);
         auto ret = std::make_unique<sentence::Expression>(std::move(expression));
         ret->pos = std::move(pos);
         return ret;
-    }else if(token_ref->is_colon()){
-        if(auto identifier = expression->identifier()){
-            auto pos = std::move(expression->pos);
-            lexer.next(); // コロン自体
+    }else if(token && token->is_colon()){
+        if(expression) if(auto identifier = expression->identifier()){
+            auto pos = expression->pos + token->pos;
             auto type = parse_type(lexer);
-
+            if(type) pos += type->pos;
             auto equal_or_semicolon = lexer.next();
-            pos::Range end_pos;
-
+            if(!equal_or_semicolon) throw error::make<error::NoSemicolonAfterDeclaration>(std::nullopt, std::move(pos));
             std::unique_ptr<expression::Expression> right_side;
             if(equal_or_semicolon->is_semicolon()){
-                right_side = nullptr;
-                end_pos = std::move(equal_or_semicolon->pos);
+                pos += equal_or_semicolon->pos;
             }else if(equal_or_semicolon->is_equal()){
                 right_side = parse_expression(lexer);
+                if(!right_side) throw error::make<error::NoExpressionAfterOperator>(std::move(equal_or_semicolon->pos));
+                pos += right_side->pos;
                 auto semicolon = lexer.next();
-                if(!semicolon->is_semicolon()){
-                    // エラー
-                    return nullptr;
+                if(semicolon && semicolon->is_semicolon()){
+                    pos += semicolon->pos;
+                }else{
+                    std::optional<pos::Range> pos_not_semicolon;
+                    if(semicolon) pos_not_semicolon = std::move(semicolon->pos);
+                    throw error::make<error::NoSemicolonAfterDeclaration>(std::move(pos_not_semicolon), std::move(pos));
                 }
-                end_pos = std::move(semicolon->pos);
-            }else{
-                // エラー
-                return nullptr;
-            }
-
-            pos += end_pos;
+            }else throw error::make<error::NoSemicolonAfterDeclaration>(std::move(equal_or_semicolon->pos), std::move(pos));
             auto ret = std::make_unique<sentence::Declaration>(std::move(identifier.value()), std::move(type), std::move(right_side));
             ret->pos = std::move(pos);
             return ret;
-        }else{
-            // コロンの前が識別子ではない
-            // 本当はエラー
-            return nullptr;
         }
+        // コロンの前が識別子ではなかった
+        std::optional<pos::Range> pos;
+        if(expression) pos = std::move(expression->pos);
+        throw error::make<error::NoIdentifierBeforeColon>(std::move(pos), std::move(token->pos));
+    }else if(expression){
+        // 式の終わりにセミコロンがないまま EOF
+        std::optional<pos::Range> pos;
+        if(token) pos = std::move(token->pos);
+        throw error::make<error::NoSemicolonAfterExpression>(std::move(pos), std::move(expression->pos));
+    }else if(token){
+        if(token->is_opening_brace()){
+            // ブロックの開始
+            std::vector<std::unique_ptr<sentence::Sentence>> sentences;
+            while(true){
+                auto &token_ref = lexer.peek();
+                if(!token_ref) throw error::make<error::NoClosingBrace>(std::move(token->pos));
+                if(token_ref->is_closing_brace()){
+                    auto ret = std::make_unique<sentence::Block>(std::move(sentences));
+                    ret->pos = token->pos + lexer.next()->pos;
+                    return ret;
+                }
+                // token_ref が nullptr でないので EOF ではない，よって parse_sentence() は nullptr を返さない
+                sentences.push_back(parse_sentence(lexer));
+            }
+        }
+        if(auto keyword = token->keyword()){
+            if(keyword.value() == token::Keyword::If || keyword.value() == token::Keyword::Else){
+                auto pos = std::move(token->pos);
+                auto open = lexer.next();
+                if(!open) throw error::make<error::NoParenthesisAfterKeyword>(std::nullopt, std::move(token->pos));
+                if(!open->is_opening_parenthesis()) throw error::make<error::NoParenthesisAfterKeyword>(std::move(open->pos), std::move(token->pos));
+                auto condition = parse_expression(lexer);
+                auto close = lexer.next();
+                if(!close) throw error::make<error::NoClosingParenthesis>(std::move(open->pos));
+                if(!close->is_closing_parenthesis()) throw error::make<error::UnexpectedTokenInParenthesis>(std::move(close->pos), std::move(open->pos));
+                if(!condition) throw error::make<error::EmptyCondition>(std::move(open->pos), std::move(close->pos));
+                auto sentence = parse_sentence(lexer);
+                if(!sentence) throw error::make<error::UnexpectedEOFInControlStatement>(pos + close->pos);
+                if(keyword.value() == token::Keyword::If){
+                    if(auto &else_ref = lexer.peek()){
+                        if(auto keyword_else = else_ref->keyword()){
+                            if(keyword_else.value() == token::Keyword::Else){
+                                auto pos_else = std::move(lexer.next()->pos);
+                                auto else_clause = parse_sentence(lexer);
+                                if(!else_clause) throw error::make<error::UnexpectedEOFInControlStatement>(pos + pos_else);
+                                pos += else_clause->pos;
+                                auto ret = std::make_unique<sentence::If>(std::move(condition), std::move(sentence), std::move(else_clause));
+                                ret->pos = std::move(pos);
+                                return ret;
+                            }
+                        }
+                    }
+                }
+                pos += sentence->pos;
+                std::unique_ptr<sentence::Sentence> ret;
+                if(keyword.value() == token::Keyword::If){
+                    ret = std::make_unique<sentence::If>(std::move(condition), std::move(sentence), nullptr);
+                }else{
+                    ret = std::make_unique<sentence::While>(std::move(condition), std::move(sentence));
+                }
+                ret->pos = std::move(pos);
+                return ret;
+            }
+        }
+        throw error::make<error::UnexpectedTokenAtSentence>(std::move(token->pos));
+    }else{
+        // 正常に EOF に達した
+        return nullptr;
     }
-    return nullptr;
 }
