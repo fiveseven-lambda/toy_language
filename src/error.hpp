@@ -35,18 +35,24 @@ namespace error {
         return std::make_unique<Err>(std::forward<Args>(args)...);
     }
 
-    //! 字句解析中に予期せぬ文字が現れた．
+    /**
+     * @brief 字句解析中に予期せぬ文字が現れた．
+     *
+     * 空白とコメント以外に，トークンの始まりとして適さない文字があった．
+     */
     class UnexpectedCharacter : public Error {
-        // 予期せぬ文字の現れた場所
         pos::Pos pos;
     public:
         UnexpectedCharacter(pos::Pos);
         void eprint(const std::vector<std::string> &) const override;
     };
 
-    //! コメントが終了しなかった．
+    /**
+     * @brief コメントが終了しなかった．
+     *
+     * コメントの途中で EOF に達した．
+     */
     class UnterminatedComment : public Error {
-        // コメントの開始位置
         std::vector<pos::Pos> poss;
     public:
         UnterminatedComment(std::vector<pos::Pos>);
@@ -55,9 +61,7 @@ namespace error {
 
     //! 整数リテラルの値が符号付き 32 ビット整数型におさまらなかった．
     class InvalidIntegerLiteral : public Error {
-        // boost の safe_numerics が投げた例外
         std::exception &error;
-        // 起きた位置
         pos::Range pos;
     public:
         InvalidIntegerLiteral(std::exception &, pos::Range);
@@ -83,17 +87,9 @@ namespace error {
 
     //! 括弧の中身が空
     class EmptyParenthesis : public Error {
-        pos::Range pos;
+        pos::Range open, close;
     public:
-        EmptyParenthesis(pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
-    };
-
-    //! factor が来るべきところで，予期せぬトークン
-    class UnexpectedTokenAtFactor : public Error {
-        pos::Range pos;
-    public:
-        UnexpectedTokenAtFactor(pos::Range);
+        EmptyParenthesis(pos::Range, pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
 
@@ -103,6 +99,14 @@ namespace error {
         pos::Range pos;
     public:
         UnexpectedEOFAfterPrefix(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    //! prefix の直後に予期せぬトークン
+    class UnexpectedTokenAfterPrefix : public Error {
+        pos::Range pos_token, pos_prefix;
+    public:
+        UnexpectedTokenAfterPrefix(pos::Range, pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
 

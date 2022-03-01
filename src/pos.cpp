@@ -79,6 +79,13 @@ namespace pos {
     }
 
     /**
+     * @brief 範囲を結合する．
+     */
+    Range operator+(const Range &left, const Range &right){
+        return Range(left.start, right.end);
+    }
+
+    /**
      * @brief `line`，`byte` の値を 1-indexed に直して出力する．
      */
     std::ostream &operator<<(std::ostream &os, const Pos &pos){

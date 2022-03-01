@@ -5,20 +5,49 @@
 
 namespace error {
     Error::~Error() = default;
-    //! コンストラクタ
+    /**
+     * @brief コンストラクタ
+     * @param pos 予期せぬ文字のあった場所
+     */
     UnexpectedCharacter::UnexpectedCharacter(pos::Pos pos): pos(std::move(pos)) {}
-    //! コンストラクタ
+    /**
+     * @brief コンストラクタ
+     * @param poss コメントの開始位置．ネストしていた場合それら全て
+     */
     UnterminatedComment::UnterminatedComment(std::vector<pos::Pos> poss): poss(std::move(poss)) {}
-    //! コンストラクタ
+    /**
+     * @brief コンストラクタ
+     * @param error boost の safe_numerics が投げた例外
+     * @param pos 整数リテラルの位置
+     */
     InvalidIntegerLiteral::InvalidIntegerLiteral(std::exception &error, pos::Range pos): error(error), pos(std::move(pos)) {}
-    //! コンストラクタ
+    /**
+     * @brief コンストラクタ
+     * @param pos_token 予期せぬトークンの位置
+     * @param pos_prefix 前置単項演算子の位置
+     */
+    UnexpectedTokenAfterPrefix::UnexpectedTokenAfterPrefix(pos::Range pos_token, pos::Range pos_prefix):
+        pos_token(std::move(pos_token)),
+        pos_prefix(std::move(pos_prefix)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos 開き括弧の位置
+     */
     NoClosingParenthesis::NoClosingParenthesis(pos::Range pos): pos(std::move(pos)) {}
-    //! コンストラクタ
+    /**
+     * @brief コンストラクタ
+     * @param pos 予期せぬトークンの位置
+     * @param open 開き括弧の位置
+     */
     UnexpectedTokenInParenthesis::UnexpectedTokenInParenthesis(pos::Range pos, pos::Range open): pos(std::move(pos)), open(std::move(open)) {}
-    //! コンストラクタ
-    EmptyParenthesis::EmptyParenthesis(pos::Range pos): pos(std::move(pos)) {}
-    //! コンストラクタ
-    UnexpectedTokenAtFactor::UnexpectedTokenAtFactor(pos::Range pos): pos(std::move(pos)) {}
+    /**
+     * @brief コンストラクタ
+     * @param open 開き括弧の位置
+     * @param close 閉じ括弧の位置
+     */
+    EmptyParenthesis::EmptyParenthesis(pos::Range open, pos::Range close):
+        open(std::move(open)),
+        close(std::move(close)) {}
     //! コンストラクタ
     UnexpectedEOFAfterPrefix::UnexpectedEOFAfterPrefix(pos::Range pos) : pos(std::move(pos)) {}
     /**
@@ -47,6 +76,12 @@ namespace error {
         std::cerr << "invalid integer literal (" << error.what() << ") at " << pos << std::endl;
         pos.eprint(log);
     }
+    void UnexpectedTokenAfterPrefix::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "unexpected token at " << pos_token << std::endl;
+        pos_token.eprint(log);
+        std::cerr << "after prefix at " << pos_prefix << std::endl;
+        pos_prefix.eprint(log);
+    }
     void NoClosingParenthesis::eprint(const std::vector<std::string> &log) const {
         std::cerr << "no closing parenthesis (opened at " << pos << ")" << std::endl;
         pos.eprint(log);
@@ -58,12 +93,10 @@ namespace error {
         open.eprint(log);
     }
     void EmptyParenthesis::eprint(const std::vector<std::string> &log) const {
-        std::cerr << "empty parenthesis (opened at " << pos << ")" << std::endl;
-        pos.eprint(log);
-    }
-    void UnexpectedTokenAtFactor::eprint(const std::vector<std::string> &log) const {
-        std::cerr << "unexpected token at " << pos << " (expected a factor)" << std::endl;
-        pos.eprint(log);
+        std::cerr << "empty parenthesis (opened at " << open << ")" << std::endl;
+        open.eprint(log);
+        std::cerr << "closed at " << close << ")" << std::endl;
+        close.eprint(log);
     }
     void UnexpectedEOFAfterPrefix::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected end of file after the prefix at " << pos << std::endl;
