@@ -6,9 +6,10 @@
 #define TYPE_HPP
 
 #include "pos.hpp"
+#include "value.hpp"
 
 /**
- * @brief 型を定義する．
+ * @brief ソースコード中に書かれた型名．
  */
 namespace type {
     /**
@@ -19,21 +20,24 @@ namespace type {
         //! ソースコード中の位置．
         pos::Range pos;
         virtual ~Type();
+        virtual std::unique_ptr<value::Type> into() const = 0;
         //! デバッグ出力用の関数．いずれ消す．
         virtual void debug_print(int = 0) const = 0;
     };
 
     /**
-     * @brief 32 ビット整数型
+     * @brief `value::Integer`
      */
     class Integer : public Type {
+        std::unique_ptr<value::Type> into() const override;
         void debug_print(int) const override;
     };
 
     /**
-     * @brief 論理型
+     * @brief `value::Boolean`
      */
     class Boolean : public Type {
+        std::unique_ptr<value::Type> into() const override;
         void debug_print(int) const override;
     };
 }

@@ -4,6 +4,7 @@
 #include "expression.hpp"
 
 #include <string_view>
+#include "error.hpp"
 
 namespace expression {
     Expression::~Expression() = default;
@@ -45,14 +46,38 @@ namespace expression {
     std::optional<std::string> Expression::identifier() { return std::nullopt; }
     std::optional<std::string> Identifier::identifier() { return std::move(name); }
 
-    value::Value Identifier::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
-    value::Value Integer::compile(Environment &environment, std::unordered_map<std::string, value::Value> &){
-        return value::make<value::Integer>(environment.builder.getInt32(value));
+    value::Value Identifier::compile(Context &context, std::unordered_map<std::string, value::Value> &local_variables){
+        auto local = local_variables.find(name);
+        std::shared_ptr<value::Type> return_type;
+        llvm::Value *return_value;
+        if(local != local_variables.end()){
+        }else{
+            auto global = context.global_variables.find(name);
+            if(global != context.global_variables.end()){
+                auto llvm_type = global->second.second->llvm_type(*context.context.getContext());
+                auto pointer = new llvm::GlobalVariable(
+                    context.get_module(),
+                    llvm_type,
+                    false,
+                    llvm::GlobalValue::ExternalLinkage,
+                    nullptr,
+                    context.global_variable_name(global->second.first)
+                );
+                return_type = global->second.second;
+                return_value = context.builder.CreateLoad(llvm_type, pointer);
+            }else{
+                throw error::make<error::UndefinedVariable>(std::move(pos));
+            }
+        }
+        return value::Value(std::move(return_type), return_value);
     }
-    value::Value UnaryOperation::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
-    value::Value BinaryOperation::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
-    value::Value Group::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
-    value::Value Invocation::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
+    value::Value Integer::compile(Context &context, std::unordered_map<std::string, value::Value> &){
+        return value::make<value::Integer>(context.builder.getInt32(value));
+    }
+    value::Value UnaryOperation::compile(Context &, std::unordered_map<std::string, value::Value> &){}
+    value::Value BinaryOperation::compile(Context &, std::unordered_map<std::string, value::Value> &){}
+    value::Value Group::compile(Context &, std::unordered_map<std::string, value::Value> &){}
+    value::Value Invocation::compile(Context &, std::unordered_map<std::string, value::Value> &){}
 
     static constexpr std::string_view INDENT = "    ";
     void Identifier::debug_print(int depth) const {

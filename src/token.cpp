@@ -4,7 +4,6 @@
 #include "token.hpp"
 
 #include <boost/safe_numerics/safe_integer.hpp>
-#include <unordered_map>
 
 #include "error.hpp"
 

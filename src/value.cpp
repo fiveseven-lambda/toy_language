@@ -1,3 +1,6 @@
+/**
+ * @file value.cpp
+ */
 #include "value.hpp"
 
 #include "llvm/IR/DerivedTypes.h"
@@ -17,5 +20,6 @@ namespace value {
     llvm::Constant *Boolean::default_value(llvm::LLVMContext &context){
         return llvm::ConstantInt::getFalse(context);
     }
+    Value::Value(): llvm_value(nullptr) {}
     Value::Value(std::shared_ptr<value::Type> type, llvm::Value *llvm_value): type(std::move(type)), llvm_value(llvm_value) {}
 }

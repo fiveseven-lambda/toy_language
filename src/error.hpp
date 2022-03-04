@@ -192,6 +192,14 @@ namespace error {
         UnexpectedEOFInControlStatement(pos::Range);
         void eprint(const std::vector<std::string> &) const override;
     };
+
+    //! 宣言されていない変数を使用しようとした
+    class UndefinedVariable : public Error {
+        pos::Range pos;
+    public:
+        UndefinedVariable(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
 }
 
 #endif

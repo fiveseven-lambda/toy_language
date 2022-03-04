@@ -114,6 +114,11 @@ namespace error {
      * @param pos 制御文の位置
      */
     UnexpectedEOFInControlStatement::UnexpectedEOFInControlStatement(pos::Range pos): pos(std::move(pos)) {}
+    /**
+     * @brief コンストラクタ
+     * @param pos 変数の位置
+     */
+    UndefinedVariable::UndefinedVariable(pos::Range pos): pos(std::move(pos)) {}
 
     void UnexpectedCharacter::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected character at " << pos << std::endl;
@@ -215,6 +220,10 @@ namespace error {
     }
     void UnexpectedEOFInControlStatement::eprint(const std::vector<std::string> &log) const {
         std::cerr << "unexpected EOF in control statement at " << pos << std::endl;
+        pos.eprint(log);
+    }
+    void UndefinedVariable::eprint(const std::vector<std::string> &log) const {
+        std::cerr << "undefined variable at " << pos << std::endl;
         pos.eprint(log);
     }
 }
