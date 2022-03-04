@@ -6,6 +6,9 @@
 #include "error.hpp"
 #include "context.hpp"
 
+/**
+ * @todo コマンドライン引数を読む
+ */
 int main(){
     Lexer lexer;
     Context context;

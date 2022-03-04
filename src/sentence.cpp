@@ -63,18 +63,23 @@ namespace sentence {
         return llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, context.function_name(), *context.module);
     }
 
+    /**
+     * @brief コンパイル
+     * 
+     * 今は `virtual` ではないが，関数定義ができるようになったら，関数の型とかが変わるので変える必要がある
+     */
     llvm::orc::ThreadSafeModule Sentence::compile(Context &context){
-        auto &module = context.next_module();
+        context.next_module();
         llvm::Function *function = create_function(context);
         llvm::BasicBlock *basic_block = llvm::BasicBlock::Create(*context.context.getContext(), "", function);
         context.builder.SetInsertPoint(basic_block);
         std::unordered_map<std::string, value::Value> local_variables;
         compile_global(context, local_variables);
+        context.builder.CreateRetVoid();
         return llvm::orc::ThreadSafeModule(context.take_module(), context.context);
     }
     void Expression::compile_global(Context &context, std::unordered_map<std::string, value::Value> &local_variables){
         expression->compile(context, local_variables);
-        context.builder.CreateRetVoid();
     }
     void Declaration::compile_global(Context &context, std::unordered_map<std::string, value::Value> &local_variables){
         value::Value value;
@@ -98,7 +103,6 @@ namespace sentence {
             name,
             std::make_pair(context.get_module_number(), std::move(value.type))
         );
-        context.builder.CreateRetVoid();
     }
     void Block::compile_global(Context &, std::unordered_map<std::string, value::Value> &){}
     void If::compile_global(Context &, std::unordered_map<std::string, value::Value> &){}

@@ -12,6 +12,8 @@
 
 /**
  * @brief `llvm::Value *` と型情報の組を扱う
+ *
+ * @todo 関数型を追加する
  */
 namespace value {
     /**
