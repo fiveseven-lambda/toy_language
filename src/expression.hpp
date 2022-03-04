@@ -7,8 +7,11 @@
 
 #include <memory>
 #include <optional>
+#include <unordered_map>
 
+#include "environment.hpp"
 #include "pos.hpp"
+#include "value.hpp"
 
 /**
  * @brief 式を定義する
@@ -72,6 +75,7 @@ namespace expression {
         pos::Range pos;
         virtual ~Expression();
         virtual std::optional<std::string> identifier();
+        virtual value::Value compile(Environment &, std::unordered_map<std::string, value::Value> &) = 0;
         //! デバッグ出力用の関数．いずれ消す．
         virtual void debug_print(int = 0) const = 0;
     };
@@ -84,6 +88,7 @@ namespace expression {
     public:
         Identifier(std::string);
         std::optional<std::string> identifier() override;
+        value::Value compile(Environment &, std::unordered_map<std::string, value::Value> &) override;
         void debug_print(int) const override;
     };
 
@@ -94,6 +99,7 @@ namespace expression {
         std::int32_t value;
     public:
         Integer(std::int32_t);
+        value::Value compile(Environment &, std::unordered_map<std::string, value::Value> &) override;
         void debug_print(int) const override;
     };
 
@@ -119,6 +125,7 @@ namespace expression {
         std::unique_ptr<Expression> operand;
     public:
         UnaryOperation(UnaryOperator, std::unique_ptr<Expression>);
+        value::Value compile(Environment &, std::unordered_map<std::string, value::Value> &) override;
         void debug_print(int) const override;
     };
 
@@ -194,6 +201,7 @@ namespace expression {
         std::unique_ptr<Expression> left, right;
     public:
         BinaryOperation(BinaryOperator, std::unique_ptr<Expression>, std::unique_ptr<Expression>);
+        value::Value compile(Environment &, std::unordered_map<std::string, value::Value> &) override;
         void debug_print(int) const override;
     };
 
@@ -203,7 +211,8 @@ namespace expression {
     class Group : public Expression {
         std::unique_ptr<Expression> expression;
     public:
-	Group(std::unique_ptr<Expression>);
+        Group(std::unique_ptr<Expression>);
+        value::Value compile(Environment &, std::unordered_map<std::string, value::Value> &) override;
         void debug_print(int) const override;
     };
 
@@ -215,6 +224,7 @@ namespace expression {
         std::vector<std::unique_ptr<Expression>> arguments;
     public:
         Invocation(std::unique_ptr<Expression>, std::vector<std::unique_ptr<Expression>>);
+        value::Value compile(Environment &, std::unordered_map<std::string, value::Value> &) override;
         void debug_print(int) const override;
     };
 }

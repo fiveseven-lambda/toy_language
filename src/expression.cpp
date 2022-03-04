@@ -45,6 +45,15 @@ namespace expression {
     std::optional<std::string> Expression::identifier() { return std::nullopt; }
     std::optional<std::string> Identifier::identifier() { return std::move(name); }
 
+    value::Value Identifier::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
+    value::Value Integer::compile(Environment &environment, std::unordered_map<std::string, value::Value> &){
+        return value::make<value::Integer>(environment.builder.getInt32(value));
+    }
+    value::Value UnaryOperation::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
+    value::Value BinaryOperation::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
+    value::Value Group::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
+    value::Value Invocation::compile(Environment &, std::unordered_map<std::string, value::Value> &){}
+
     static constexpr std::string_view INDENT = "    ";
     void Identifier::debug_print(int depth) const {
         for(int i = 0; i < depth; ++i) std::cout << INDENT;

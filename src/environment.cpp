@@ -7,18 +7,24 @@
 
 Environment::Environment():
     context(std::make_unique<llvm::LLVMContext>()),
-    module_number(0)
-    {}
+    builder(*context.getContext()),
+    module_number(0) {}
 
-std::string Environment::module_name(){
-    std::stringstream ss;
-    ss << "m" << module_number;
-    return ss.str();
+static std::string module_name(unsigned module_number){
+    std::stringstream ret;
+    ret << "m" << module_number;
+    return ret.str();
 }
 
-llvm::orc::ThreadSafeModule Environment::compile(std::unique_ptr<sentence::Sentence>){
-    auto module = std::make_unique<llvm::Module>(module_name(), *context.getContext());
+llvm::Module &Environment::next_module(){
+    module_number++;
+    module = std::make_unique<llvm::Module>(module_name(module_number), *context.getContext());
+    return *module;
+}
 
-    ++module_number;
-    return llvm::orc::ThreadSafeModule(std::move(module), context);
+llvm::Module &Environment::get_module(){ return *module; }
+std::unique_ptr<llvm::Module> Environment::take_module(){ return std::move(module); }
+
+unsigned Environment::get_module_number(){
+    return module_number;
 }

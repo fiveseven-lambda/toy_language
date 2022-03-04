@@ -14,7 +14,7 @@ int main(){
             auto sentence = parse_sentence(lexer);
             if(!sentence) break;
             sentence->debug_print();
-            auto module = environment.compile(std::move(sentence));
+            auto module = sentence->compile(environment);
             module.withModuleDo([](const llvm::Module &mod){ mod.print(llvm::errs(), nullptr); });
         }
     }catch(std::unique_ptr<error::Error> &error){
