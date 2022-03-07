@@ -46,6 +46,24 @@ namespace expression {
     std::optional<std::string> Expression::identifier() { return std::nullopt; }
     std::optional<std::string> Identifier::identifier() { return std::move(name); }
 
+    /**
+     * @brief 識別子をコンパイルする．
+     *
+     * 名前を `local_variables`，`global_variables` の順に検索する．
+     *
+     * `local_variables` に見つかったら…… `value::Value` に `type` と `pointer` が入っているので，
+     * 1. `type` に `context` を渡して `llvm_type` を得る．
+     * 2. `builder` に `llvm_type` と `pointer` を渡して `createLoad` を呼び出す．
+     *
+     * `local_variables` に見つからず，`global_variables` に見つかったら…… `module_number` と `type` が入っているので，
+     * 1. `module_number` から `global_variable_name` を得る．
+     * 2. `type` に `context` を渡して `llvm_type` を得る．
+     * 3. `module`，`llvm_type`，`global_variable_name` を渡して `pointer = new llvm::GlobalVariable` を作る．
+     * 4. `builder` に `llvm_type` と `pointer` を渡して `createLoad` を呼び出す．
+     * 5. `local_variables` に `type` と `pointer` を保存する．
+     *
+     * どちらにも見つからなかったら…… `error::UndefinedVariable` を投げる．
+     */
     value::Value Identifier::compile(Context &context, std::unordered_map<std::string, value::Value> &local_variables){
         auto local = local_variables.find(name);
         std::shared_ptr<value::Type> return_type;
@@ -71,6 +89,13 @@ namespace expression {
         }
         return value::Value(std::move(return_type), return_value);
     }
+    /**
+     * @brief 整数リテラルをコンパイルする．
+     *
+     * 方法は 2 通りあって，
+     * - `context` から `getInt32Ty` して，`llvm::ConstantInt` を使う
+     * - `builder` の `getInt32` を使う
+     */
     value::Value Integer::compile(Context &context, std::unordered_map<std::string, value::Value> &){
         return value::make<value::Integer>(context.builder.getInt32(value));
     }

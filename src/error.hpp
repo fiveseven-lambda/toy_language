@@ -38,6 +38,7 @@ namespace error {
 
     /**
      * @brief 字句解析中に予期せぬ文字が現れた．
+     * `Lexer::peek()`，`Lexer::next()`
      *
      * 空白とコメント以外に，トークンの始まりとして適さない文字があった．
      */
@@ -50,6 +51,7 @@ namespace error {
 
     /**
      * @brief コメントが終了しなかった．
+     * `Lexer::peek()`，`Lexer::next()`
      *
      * コメントの途中で EOF に達した．
      */
@@ -60,7 +62,11 @@ namespace error {
         void eprint(const std::vector<std::string> &) const override;
     };
 
-    //! 整数リテラルの値が符号付き 32 ビット整数型におさまらなかった．
+    /**
+     * @brief 整数リテラルの値が符号付き 32 ビット整数型におさまらなかった．
+     * `token::Token::positive_integer()`，`token::Token::negative_integer()`
+     *
+     */
     class InvalidIntegerLiteral : public Error {
         std::exception &error;
         pos::Range pos;

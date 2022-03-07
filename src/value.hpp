@@ -5,6 +5,7 @@
 #define VALUE_HPP
 
 #include <memory>
+#include <vector>
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/LLVMContext.h"
@@ -30,13 +31,13 @@ namespace value {
      * @brief `llvm::Value *` と `Type` の組
      */
     struct Value {
-        std::shared_ptr<value::Type> type;
+        std::shared_ptr<Type> type;
         /**
          * @brief ポインタ
          */
         llvm::Value *llvm_value;
     public:
-        Value(std::shared_ptr<value::Type>, llvm::Value *);
+        Value(std::shared_ptr<Type>, llvm::Value *);
         Value();
     };
 
@@ -54,6 +55,14 @@ namespace value {
         llvm::Type *llvm_type(llvm::LLVMContext &) override;
         llvm::Constant *default_value(llvm::LLVMContext &) override;
     };
+
+    // class Function : public Type {
+    //     std::unique_ptr<Type> return_type;
+    //     std::vector<std::unique_ptr<Type>> argument_types;
+    //     llvm::Type *llvm_type(llvm::LLVMContext &) override;
+    //     llvm::Constant *default_value(llvm::LLVMContext &) override;
+    // };
 }
+
 
 #endif

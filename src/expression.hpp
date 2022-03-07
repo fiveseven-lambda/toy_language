@@ -72,6 +72,9 @@ namespace expression {
         pos::Range pos;
         virtual ~Expression();
         virtual std::optional<std::string> identifier();
+        /**
+         * @todo 右辺値と左辺値で扱いが異なる．関数名も `compile` ではなくそれぞれ `rvalue` / `lvalue` にする．
+         */
         virtual value::Value compile(Context &, std::unordered_map<std::string, value::Value> &) = 0;
         //! デバッグ出力用の関数．いずれ消す．
         virtual void debug_print(int = 0) const = 0;
